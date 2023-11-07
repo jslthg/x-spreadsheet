@@ -20,6 +20,7 @@ import SortFilter from './sort_filter';
 import { xtoast } from './message';
 import { cssPrefix } from '../config';
 import { formulas } from '../core/formula';
+import Image from '../core/image';
 import ModalCharts from './modal_charts';
 import DragContainer from './drag_container';
 import testimg from '../../assets/1.jpg';
@@ -581,8 +582,8 @@ function toolbarChange(type, value) {
     console.log('toolbarChange.setup');
   } else if (type === 'qrcode') {
     console.log('toolbarChange.qrcode');
-  } else if (type === 'picture') {
-    this.insertPict();
+  } else if (type === 'image') {
+    this.image();
   } else if (type === 'chart') {
     this.showModalCharts();
   } else if (type === 'bias') {
@@ -1090,7 +1091,7 @@ export default class Sheet {
     this.modalCharts.show();
   }
 
-  insertPict() {
+  image() {
     // 将图片上传到指定的服务器。
     const { data } = this;
     const { left, top } = data.getSelectedRect();
@@ -1099,7 +1100,7 @@ export default class Sheet {
     image.onload = () => {
       const img = h('div', 'image')
         .children(h('img', '').attr('src', testimg));
-      const dc = new DragContainer(img, left, top, image.width + 8, image.height + 8);
+      const dc = new DragContainer(img, left, top, image.width, image.height);
       this.overlayerCEl.child(dc.el);
       // dc.selected = () => { console.log(5555); };
       // const eldc = window.document.getElementById(dc.getId());
@@ -1111,6 +1112,7 @@ export default class Sheet {
       // 因为原渲染内容使用 text，我们既需要地址，又不像渲染 text，所以使用 value。
       // data.setSelectedCellAttr('type', 'image'); // 设置类型，方便后面的渲染。
       // data.setSelectedCellAttr('value', testimg); // 设置图片地址。方面后面使用地址渲染。
+      data.addImage(new Image(dc.getId(), testimg, left, top, image.width, image.height));
       sheetReset.call(this);
     };
   }

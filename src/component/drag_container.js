@@ -258,7 +258,7 @@ export default class DragContainer extends Element {
     const diffX = ev.clientX - el.offsetLeft;
     const diffY = ev.clientY - el.offsetTop;
 
-    // contextMenu.hide();
+    contextMenu.hide();
     if (ev.button === 2) {
       contextMenu.setPosition(ev.clientX, ev.clientY);
     } else {

@@ -12,7 +12,7 @@
 > A web-based JavaScript spreadsheet
 <p align="center">
   <a href="https://github.com/jslthg/x-spreadsheet">
-    <img width="100%" src="https://github.com/jslthg/x-spreadsheet/master/docs/demo.jpg">
+    <img width="100%" src="https://github.com/jslthg/x-spreadsheet/blob/master/docs/demo.jpg">
   </a>
 </p>
 

@@ -28,9 +28,9 @@
 <!--  <iframe src="https://ghbtns.com/github-btn.html?user=myliang&repo=x-spreadsheet&type=star&count=true&size=large" frameborder="0" scrolling="0" width="160px" height="30px"></iframe>-->
 <!--  </div>-->
   <div class="container">
-<!--    <div class="left" >-->
-<!--      <div id="drag" draggable="true">拖拽我</div>-->
-<!--    </div>-->
+    <div class="left" >
+      <div id="drag" draggable="true">拖拽我</div>
+    </div>
     <div id="x-spreadsheet-demo" class="right" ></div>
   </div>
   <script>
@@ -45,17 +45,17 @@
     //   // ev.target.appendChild(document.getElementById(data));
     // }
 
-    // function dragstart_handler(ev) {
-    //   // Add the target element's id to the data transfer object
-    //   ev.dataTransfer.dropEffect = "copy";
-    //   ev.dataTransfer.setData("application/data-report", ev.target.innerText);
-    // }
-    // window.addEventListener("DOMContentLoaded", () => {
-    //   // Get the element by id
-    //   const element = document.getElementById("drag");
-    //   // Add the ondragstart event listener
-    //   element.addEventListener("dragstart", dragstart_handler);
-    // });
+    function dragstart_handler(ev) {
+      // Add the target element's id to the data transfer object
+      ev.dataTransfer.dropEffect = "copy";
+      ev.dataTransfer.setData("application/data-report", ev.target.innerText);
+    }
+    window.addEventListener("DOMContentLoaded", () => {
+      // Get the element by id
+      const element = document.getElementById("drag");
+      // Add the ondragstart event listener
+      element.addEventListener("dragstart", dragstart_handler);
+    });
 
     function load(){
       const rows10 = { len: 1000 };

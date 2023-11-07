@@ -335,6 +335,8 @@ export default class DataProxy {
     this.validations = new Validations();
     this.hyperlinks = {};
     this.comments = {};
+    this.images = [];
+    this.charts = [];
     // save data end
 
     // don't save object
@@ -1222,6 +1224,34 @@ export default class DataProxy {
     return styles.length - 1;
   }
 
+  addImage(image) {
+    const { images } = this;
+    this.changeData(() => {
+      images.push(image);
+    });
+  }
+
+  removeImage(id) {
+    let { images } = this;
+    this.changeData(() => {
+      images = images.filter(x => x.id !== id);
+    });
+  }
+
+  addChart(chart) {
+    const { charts } = this;
+    this.changeData(() => {
+      charts.push(chart);
+    });
+  }
+
+  removeChart(id) {
+    let { charts } = this;
+    this.changeData(() => {
+      charts = charts.filter(x => x.id !== id);
+    });
+  }
+
   changeData(cb) {
     this.history.add(this.getData());
     cb();
@@ -1247,12 +1277,14 @@ export default class DataProxy {
 
   getData() {
     const {
-      name, freeze, styles, merges, rows, cols, validations, autoFilter,
+      name, freeze, styles, merges, rows, cols, validations, autoFilter, images, charts,
     } = this;
     return {
       name,
       freeze: xy2expr(freeze[1], freeze[0]),
       styles,
+      images,
+      charts,
       merges: merges.getData(),
       rows: rows.getData(),
       cols: cols.getData(),

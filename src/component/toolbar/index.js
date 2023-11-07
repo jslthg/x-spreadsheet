@@ -31,7 +31,7 @@ import { bind } from '../event';
 import Save from './save';
 import View from './view';
 import Chart from './chart';
-import Picture from './picture';
+import Image from './image';
 import Qrcode from './qrcode';
 import Setup from './setup';
 import Bias from './bias';
@@ -172,9 +172,10 @@ export default class Toolbar {
       buildDivider(),
       [
         this.chartEl = new Chart(),
-        this.pictureEl = new Picture(),
+        this.imageEl = new Image(),
         this.qrcodeEl = new Qrcode(),
         this.setupEl = new Setup(),
+        this.printEl = new Print(),
       ],
     ];
 
