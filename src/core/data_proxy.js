@@ -400,6 +400,12 @@ export default class DataProxy {
     });
   }
 
+  save() {
+    const rs = this.getData();
+    console.log('DataProxy.save', rs);
+    return rs;
+  }
+
   copy() {
     this.clipboard.copy(this.selector.range);
   }

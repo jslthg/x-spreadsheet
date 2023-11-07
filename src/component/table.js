@@ -58,6 +58,7 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
   }
 
   const cell = data.getCell(nrindex, cindex);
+  // console.log('table.renderCell', cell);
   if (cell === null) return;
   let frozen = false;
   if ('editable' in cell && cell.editable === false) {
@@ -95,6 +96,13 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
       strike: style.strike,
       underline: style.underline,
     }, style.textwrap);
+    if (Object.hasOwn(cell, 'type')) {
+      if (cell.type === 'image') {
+        const fixedIndexWidth = cols.indexWidth;
+        const fixedIndexHeight = rows.height;
+        draw.image(dbox, { value: cell.value }, { fixedIndexWidth, fixedIndexHeight });
+      }
+    }
     // error
     const error = data.validations.getError(rindex, cindex);
     if (error) {

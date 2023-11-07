@@ -1,5 +1,6 @@
 export default {
   toolbar: {
+    save: '保存',
     undo: '撤销',
     redo: '恢复',
     print: '打印',
@@ -23,6 +24,12 @@ export default {
     autofilter: '自动筛选',
     formula: '函数',
     more: '更多',
+    bias: '单元格斜线',
+    picture: '插入图片',
+    setup: '设置',
+    qrcode: '二维码',
+    chart: '图表',
+    view: '预览',
   },
   contextmenu: {
     copy: '复制',
@@ -34,6 +41,7 @@ export default {
     insertRow: '插入行',
     insertColumn: '插入列',
     deleteSheet: '删除',
+    delete: '删除',
     deleteRow: '删除行',
     deleteColumn: '删除列',
     deleteCell: '删除',
@@ -43,6 +51,7 @@ export default {
     cellnonprintable: '不可打印',
     celleditable: '可编辑',
     cellnoneditable: '不可编辑',
+    setup: '设置',
   },
   print: {
     size: '纸张大小',
@@ -131,6 +140,11 @@ export default {
       gte: '大于等于',
       eq: '等于',
       neq: '不等于',
+    },
+  },
+  charts: {
+    modalCharts: {
+      title: '添加图表',
     },
   },
 };

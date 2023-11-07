@@ -1,5 +1,6 @@
 export default {
   toolbar: {
+    save: 'Save',
     undo: 'Undo',
     redo: 'Redo',
     print: 'Print',
@@ -23,6 +24,12 @@ export default {
     autofilter: 'Filter',
     formula: 'Functions',
     more: 'More',
+    bias: 'Cell Bias',
+    picture: 'Picture',
+    setup: 'Setup',
+    qrcode: 'QR Code',
+    chart: 'Chart',
+    view: 'Preview ',
   },
   contextmenu: {
     copy: 'Copy',
@@ -33,6 +40,7 @@ export default {
     hide: 'Hide',
     insertRow: 'Insert row',
     insertColumn: 'Insert column',
+    delete: 'Delete',
     deleteSheet: 'Delete',
     deleteRow: 'Delete row',
     deleteColumn: 'Delete column',
@@ -43,6 +51,7 @@ export default {
     cellnonprintable: 'Disable export',
     celleditable: 'Enable editing',
     cellnoneditable: 'Disable editing',
+    setup: 'Setup',
   },
   print: {
     size: 'Paper size',
@@ -131,6 +140,11 @@ export default {
       gte: 'greater than or equal to',
       eq: 'equal to',
       neq: 'not equal to',
+    },
+  },
+  charts: {
+    modalCharts: {
+      title: 'Charts Type List',
     },
   },
 };

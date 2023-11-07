@@ -4,13 +4,59 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
   <title><%= htmlWebpackPlugin.options.title %></title>
+  <style>
+    html,body{
+      padding: 0;
+      margin: 0;
+      height: 100%;
+    }
+    .container{
+      display: flex;flex-direction: row;height: 100%
+    }
+    .left{
+      width: 200px;
+      padding-top: 50px;
+      padding-left: 20px;
+    }
+    .right{
+      width: calc(100% - 200px);
+    }
+  </style>
 </head>
 <body onload="load()">
-  <div style="position: fixed; right: 0; top: .3em;">
-  <iframe src="https://ghbtns.com/github-btn.html?user=myliang&repo=x-spreadsheet&type=star&count=true&size=large" frameborder="0" scrolling="0" width="160px" height="30px"></iframe>
+<!--  <div style="position: fixed; right: 0; top: .3em;">-->
+<!--  <iframe src="https://ghbtns.com/github-btn.html?user=myliang&repo=x-spreadsheet&type=star&count=true&size=large" frameborder="0" scrolling="0" width="160px" height="30px"></iframe>-->
+<!--  </div>-->
+  <div class="container">
+<!--    <div class="left" >-->
+<!--      <div id="drag" draggable="true">拖拽我</div>-->
+<!--    </div>-->
+    <div id="x-spreadsheet-demo" class="right" ></div>
   </div>
-  <div id="x-spreadsheet-demo"></div>
   <script>
+    // function dragover_handler(ev) {
+    //   ev.preventDefault();
+    //   ev.dataTransfer.dropEffect = "copy";
+    // }
+    // function drop_handler(ev) {
+    //   ev.preventDefault();
+    //   // Get the id of the target and add the moved element to the target's DOM
+    //   var data = ev.dataTransfer.getData("text/plain");
+    //   // ev.target.appendChild(document.getElementById(data));
+    // }
+
+    // function dragstart_handler(ev) {
+    //   // Add the target element's id to the data transfer object
+    //   ev.dataTransfer.dropEffect = "copy";
+    //   ev.dataTransfer.setData("application/data-report", ev.target.innerText);
+    // }
+    // window.addEventListener("DOMContentLoaded", () => {
+    //   // Get the element by id
+    //   const element = document.getElementById("drag");
+    //   // Add the ondragstart event listener
+    //   element.addEventListener("dragstart", dragstart_handler);
+    // });
+
     function load(){
       const rows10 = { len: 1000 };
       for (let i = 0; i < 1000; i += 1) {
@@ -29,7 +75,7 @@
         len: 80,
         1: {
           cells: {
-            0: { text: 'testingtesttestetst' },
+            0: { text: 'sxj' },
             2: { text: 'testing' },
           },
         },
@@ -53,75 +99,82 @@
       previewEl.width = 16
       previewEl.height = 16
 
+
       var xs = x_spreadsheet('#x-spreadsheet-demo', {
         showToolbar: true,
         showGrid: true,
-        showBottomBar: true,
+        showBottomBar: false,
         extendToolbar: {
-          left: [
-            {
-              tip: 'Save',
-              icon: saveIcon,
-              onClick: (data, sheet) => {
-                console.log('click save button：', data, sheet)
-              }
-            }
-          ],
-          right: [
-            {
-              tip: 'Preview',
-              el: previewEl,
-              onClick: (data, sheet) => {
-                console.log('click preview button：', data)
-              }
-            }
-          ],
+          // left: [
+          //   {
+          //     tip: '保存',
+          //     icon: saveIcon,
+          //     onClick: (data, sheet) => {
+          //       console.log('click save button：', data, sheet)
+          //     }
+          //   },
+          // ],
+          // right: [
+          //   {
+          //     tip: 'Preview',
+          //     el: previewEl,
+          //     onClick: (data, sheet) => {
+          //       console.log('click preview button：', data)
+          //     }
+          //   }
+          // ],
         }
       })
-        .loadData([{
-          freeze: 'B3',
-          styles: [
-            {
-              bgcolor: '#f4f5f8',
-              textwrap: true,
-              color: '#900b09',
-              border: {
-                top: ['thin', '#0366d6'],
-                bottom: ['thin', '#0366d6'],
-                right: ['thin', '#0366d6'],
-                left: ['thin', '#0366d6'],
-              },
-            },
-          ],
-          merges: [
-            'C3:D4',
-          ],
-          cols: {
-            len: 10,
-            2: { width: 200 },
-          },
-          rows,
-        }, { name: 'sheet-test', rows: rows10 }]).change((cdata) => {
-          // console.log(cdata);
-          console.log('>>>', xs.getData());
-        });
+        // .loadData([{
+        //   // freeze: 'B3',
+        //   styles: [
+        //     {
+        //       bgcolor: '#f4f5f8',
+        //       textwrap: true,
+        //       color: '#900b09',
+        //       border: {
+        //         top: ['thin', '#0366d6'],
+        //         bottom: ['thin', '#0366d6'],
+        //         right: ['thin', '#0366d6'],
+        //         left: ['thin', '#0366d6'],
+        //       },
+        //     },
+        //   ],
+        //   merges: [
+        //     'C3:D4',
+        //   ],
+        //   cols: {
+        //     len: 10,
+        //     2: { width: 200 },
+        //   },
+        //   rows,
+        // }, { name: 'sheet-test', rows: rows10 }]).change((cdata) => {
+        //   // console.log(cdata);
+        //   console.log('>>>', xs.getData());
+        // });
+      //
+// console.log(3333333333,xs)
+//       xs.on('cell-selected', (cell, ri, ci) => {
+//           console.log('cell-selected:', cell, ', ri:', ri, ', ci:', ci);
+//         }).on('cell-edited', (text, ri, ci) => {
+//           console.log('text-edited:', text, ', ri: ', ri, ', ci:', ci);
+//         }).on('pasted-clipboard', (data) => {
+//           console.log('>>>> data is  pasted-clipboard ', data);
+//         }).on('saved', function(){
+//         console.log('click save button：')
+//       });
+      //
+      // setTimeout(() => {
+      //   // xs.loadData([{ rows }]);
+      //   xs.cellText(6, 3, 'cell-text').reRender();
+      //   console.log('cell(8, 8):', xs.cell(8, 8));
+      //   console.log('cellStyle(8, 8):', xs.cellStyle(8, 8));
+      // }, 5000);
 
-      xs.on('cell-selected', (cell, ri, ci) => {
-          console.log('cell:', cell, ', ri:', ri, ', ci:', ci);
-        }).on('cell-edited', (text, ri, ci) => {
-          console.log('text:', text, ', ri: ', ri, ', ci:', ci);
-        }).on('pasted-clipboard', (data) => {
-          console.log('>>>> data is ', data);
-        });
-
-      setTimeout(() => {
-        // xs.loadData([{ rows }]);
-        xs.cellText(14, 3, 'cell-text').reRender();
-        console.log('cell(8, 8):', xs.cell(8, 8));
-        console.log('cellStyle(8, 8):', xs.cellStyle(8, 8));
-      }, 5000);
     }
+
   </script>
-  <!--script type="text/javascript" src="https://unpkg.com/x-data-spreadsheet@1.0.20/dist/locale/zh-cn.js"></script-->
+
+
 </body>
 </html>

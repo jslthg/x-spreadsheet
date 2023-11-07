@@ -28,6 +28,13 @@ import Item from './item';
 import { h } from '../element';
 import { cssPrefix } from '../../config';
 import { bind } from '../event';
+import Save from './save';
+import View from './view';
+import Chart from './chart';
+import Picture from './picture';
+import Qrcode from './qrcode';
+import Setup from './setup';
+import Bias from './bias';
 
 function buildDivider() {
   return h('div', `${cssPrefix}-toolbar-divider`);
@@ -112,9 +119,14 @@ export default class Toolbar {
     const style = data.defaultStyle();
     this.items = [
       [
+        this.viewEl = new View(),
+      ],
+      buildDivider(),
+      [
+        this.saveEl = new Save(),
         this.undoEl = new Undo(),
         this.redoEl = new Redo(),
-        new Print(),
+        // new Print(),
         this.paintformatEl = new Paintformat(),
         this.clearformatEl = new Clearformat(),
       ],
@@ -152,6 +164,17 @@ export default class Toolbar {
         this.freezeEl = new Freeze(),
         this.autofilterEl = new Autofilter(),
         this.formulaEl = new Formula(),
+      ],
+      buildDivider(),
+      [
+        this.biasEl = new Bias(),
+      ],
+      buildDivider(),
+      [
+        this.chartEl = new Chart(),
+        this.pictureEl = new Picture(),
+        this.qrcodeEl = new Qrcode(),
+        this.setupEl = new Setup(),
       ],
     ];
 

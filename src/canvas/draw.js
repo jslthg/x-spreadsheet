@@ -392,6 +392,30 @@ class Draw {
     dtextcb();
     ctx.restore();
   }
+
+  /**
+   * 画图片。
+   * @param {*} box - 一个 DrawBox 对象
+   * @param {string} src - 图片的路径
+   * @param {Object} fixedIndexWidth - 行坐标宽度
+   * @param {Object} fixedIndexHeight - 列坐标高度
+   */
+  image(box, { value: src }, { fixedIndexWidth, fixedIndexHeight }) {
+    const img = new window.Image();
+    img.src = src;
+    img.onload = () => {
+      this.ctx.save();
+      const {
+        x, y, width, height,
+      } = box;
+      const sx = x + fixedIndexWidth;
+      const sy = y + fixedIndexHeight;
+      this.ctx.drawImage(img, npx(sx), npx(sy), npx(width), npx(height));
+      this.ctx.restore();
+    };
+
+    return this;
+  }
 }
 
 export default {};

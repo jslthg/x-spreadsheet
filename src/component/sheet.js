@@ -1,4 +1,5 @@
 /* global window */
+import * as echarts from 'echarts';
 import { h } from './element';
 import {
   bind,
@@ -19,7 +20,10 @@ import SortFilter from './sort_filter';
 import { xtoast } from './message';
 import { cssPrefix } from '../config';
 import { formulas } from '../core/formula';
-
+import ModalCharts from './modal_charts';
+import DragContainer from './drag_container';
+import testimg from '../../assets/1.jpg';
+import { guid } from '../utils/guid';
 /**
  * @desc throttle fn
  * @param func function
@@ -126,8 +130,13 @@ function selectorMove(multiple, direction) {
   scrollbarMove.call(this);
 }
 
+/**
+ * 鼠标移动事件
+ * @param evt
+ */
 // private methods
 function overlayerMousemove(evt) {
+  // console.log('overlayerMousemove', evt);
   // console.log('x:', evt.offsetX, ', y:', evt.offsetY);
   if (evt.buttons !== 0) return;
   if (evt.target.className === `${cssPrefix}-resizer-hover`) return;
@@ -171,6 +180,10 @@ function overlayerMousemove(evt) {
   }
 }
 
+/**
+ * 鼠标滚轮事件
+ * @param evt
+ */
 // let scrollThreshold = 15;
 function overlayerMousescroll(evt) {
   // scrollThreshold -= 1;
@@ -244,6 +257,7 @@ function overlayerMousescroll(evt) {
 }
 
 function overlayerTouch(direction, distance) {
+  console.log('overlayerTouch');
   const { verticalScrollbar, horizontalScrollbar } = this;
   const { top } = verticalScrollbar.scroll();
   const { left } = horizontalScrollbar.scroll();
@@ -559,6 +573,20 @@ function toolbarChange(type, value) {
     this.undo();
   } else if (type === 'redo') {
     this.redo();
+  } else if (type === 'save') {
+    this.save();
+  } else if (type === 'view') {
+    console.log('toolbarChange.view');
+  } else if (type === 'setup') {
+    console.log('toolbarChange.setup');
+  } else if (type === 'qrcode') {
+    console.log('toolbarChange.qrcode');
+  } else if (type === 'picture') {
+    this.insertPict();
+  } else if (type === 'chart') {
+    this.showModalCharts();
+  } else if (type === 'bias') {
+    console.log('toolbarChange.bias');
   } else if (type === 'print') {
     this.print.preview();
   } else if (type === 'paintformat') {
@@ -608,6 +636,7 @@ function sheetInitEvents() {
     toolbar,
     modalValidation,
     sortFilter,
+    modalCharts,
   } = this;
   // overlayer
   overlayerEl
@@ -715,6 +744,45 @@ function sheetInitEvents() {
     }
   };
 
+  /**
+   * modal  click ok button
+   * @param t
+   */
+  modalCharts.ok = (t) => {
+    const { data } = this;
+    const { left, top } = data.getSelectedRect();
+    const chart = h('div', 'chart');
+    const id = guid();
+    chart.attr('id', id);
+    const dc = new DragContainer(chart, left, top);
+    this.overlayerCEl.child(dc.el);
+
+    const myChart = echarts.init(chart.el);
+    const option = {
+      xAxis: {
+        type: 'category',
+        data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      },
+      yAxis: {
+        type: 'value',
+      },
+      series: [
+        {
+          data: [120, 200, 150, 80, 70, 110, 130],
+          type: 'bar',
+          showBackground: true,
+          backgroundStyle: {
+            color: 'rgba(180, 180, 180, 0.2)',
+          },
+        },
+      ],
+    };
+
+    myChart.setOption(option);
+
+    dc.resize = () => { myChart.resize(); };
+  };
+
   bind(window, 'resize', () => {
     this.reload();
   });
@@ -733,6 +801,31 @@ function sheetInitEvents() {
     if (!this.focusing) return;
     copy.call(this, evt);
     evt.preventDefault();
+  });
+
+
+  /**
+   * 绑定拖拽事件
+   */
+  bind(window, 'dragover', (evt) => {
+    evt.preventDefault();
+    evt.dataTransfer.dropEffect = 'move';
+  });
+  /**
+   * 绑定拖拽事件
+   */
+  bind(window, 'drop', (evt) => {
+    evt.preventDefault();
+    // 获取自定义节点信息
+    const dt = evt.dataTransfer.getData('application/data-report');
+    const { data, table } = this;
+    // 获取鼠标所在cell位置
+    const cRect = data.getCellRectByXY(evt.offsetX, evt.offsetY);
+    console.log('drop', evt, dt, data, cRect, this);
+    // 设置cell内容
+    data.setCellText(cRect.ri, cRect.ci, dt, 'finished');
+    // 刷新显示
+    table.render();
   });
 
   // for selector
@@ -757,6 +850,11 @@ function sheetInitEvents() {
         case 89:
           // redo: ctrl + y
           this.redo();
+          evt.preventDefault();
+          break;
+        case 83:
+          // save: ctrl + s
+          this.save();
           evt.preventDefault();
           break;
         case 67:
@@ -902,6 +1000,7 @@ export default class Sheet {
     // scrollbar
     this.verticalScrollbar = new Scrollbar(true);
     this.horizontalScrollbar = new Scrollbar(false);
+
     // editor
     this.editor = new Editor(
       formulas,
@@ -910,6 +1009,7 @@ export default class Sheet {
     );
     // data validation
     this.modalValidation = new ModalValidation();
+    this.modalCharts = new ModalCharts();
     // contextMenu
     this.contextMenu = new ContextMenu(() => this.getRect(), !showContextmenu);
     // selector
@@ -933,6 +1033,7 @@ export default class Sheet {
       this.horizontalScrollbar.el,
       this.contextMenu.el,
       this.modalValidation.el,
+      this.modalCharts.el,
       this.sortFilter.el,
     );
     // table
@@ -978,6 +1079,40 @@ export default class Sheet {
     data.setFreeze(ri, ci);
     sheetReset.call(this);
     return this;
+  }
+
+  save() {
+    this.data.save();
+    sheetReset.call(this);
+  }
+
+  showModalCharts() {
+    this.modalCharts.show();
+  }
+
+  insertPict() {
+    // 将图片上传到指定的服务器。
+    const { data } = this;
+    const { left, top } = data.getSelectedRect();
+    const image = new window.Image();
+    image.src = testimg;
+    image.onload = () => {
+      const img = h('div', 'image')
+        .children(h('img', '').attr('src', testimg));
+      const dc = new DragContainer(img, left, top, image.width + 8, image.height + 8);
+      this.overlayerCEl.child(dc.el);
+      // dc.selected = () => { console.log(5555); };
+      // const eldc = window.document.getElementById(dc.getId());
+      // console.log('id', dc.getId(), eldc);
+      // this.el.child(dc);
+      // dc.active();
+      // 其实是设置该单元格 type: 'image'， value: imageUrl，在后面进行渲染。
+      // 因为 setSelectedCellAttr 只能设置一个值，所以这里需要先设置 type，再设置 value。
+      // 因为原渲染内容使用 text，我们既需要地址，又不像渲染 text，所以使用 value。
+      // data.setSelectedCellAttr('type', 'image'); // 设置类型，方便后面的渲染。
+      // data.setSelectedCellAttr('value', testimg); // 设置图片地址。方面后面使用地址渲染。
+      sheetReset.call(this);
+    };
   }
 
   undo() {
