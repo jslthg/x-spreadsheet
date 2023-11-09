@@ -287,18 +287,12 @@ export default class DragContainer extends Element {
   getFirstCell(left, top) {
     const { dp } = this;
     const firstCell = dp.getCellRectByXY(left, top);
-    let fr = 0; let fc = 0;
-    if (firstCell.ri > 0) {
-      fr = firstCell.ri;
-    }
-    if (firstCell.ci > 0) {
-      fc = firstCell.ci;
-    }
+
     let rowHeight = 0; let colWidth = 0;
-    for (let i = 0; i <= fr; i += 1) {
+    for (let i = 0; i <= firstCell.ri; i += 1) {
       rowHeight += dp.rows.getHeight(i);
     }
-    for (let i = 0; i <= fc; i += 1) {
+    for (let i = 0; i <= firstCell.ci; i += 1) {
       colWidth += dp.cols.getWidth(i);
     }
     return { rowHeight, colWidth };
