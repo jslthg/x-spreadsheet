@@ -1,13 +1,35 @@
 
 
-export default class Image {
-  constructor(id, src, left, top, width, height, cellRange) {
-    this.id = id;
-    this.src = src;
-    this.left = left;
-    this.top = top;
-    this.width = width;
-    this.height = height;
-    this.cellRange = cellRange;
+export default class Images {
+  constructor(len) {
+    this._ = {};
+    this.len = len;
+  }
+
+  setData(d) {
+    if (d.len) {
+      this.len = d.len;
+      delete d.len;
+    }
+    this._ = d;
+  }
+
+  getData() {
+    const { len } = this;
+    return Object.assign({ len }, this._);
+  }
+
+  get(id) {
+    return this._[id];
+  }
+
+  insert(id, img = {}) {
+    this._[id] = img;
+    this.len += 1;
+  }
+
+  delete(id) {
+    delete this._[id];
+    this.len -= 1;
   }
 }

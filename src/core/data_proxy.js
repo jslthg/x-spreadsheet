@@ -13,6 +13,8 @@ import { Validations } from './validation';
 import { CellRange } from './cell_range';
 import { expr2xy, xy2expr } from './alphabet';
 import { t } from '../locale/locale';
+import Images from './image';
+import Charts from './chart';
 
 // private methods
 /*
@@ -335,8 +337,8 @@ export default class DataProxy {
     this.validations = new Validations();
     this.hyperlinks = {};
     this.comments = {};
-    this.images = [];
-    this.charts = [];
+    this.images = new Images(0);
+    this.charts = new Charts(0);
     // save data end
 
     // don't save object
@@ -1224,23 +1226,9 @@ export default class DataProxy {
     return styles.length - 1;
   }
 
-  addImage(image) {
-    const { images } = this;
-    this.changeData(() => {
-      images.push(image);
-    });
-  }
-
-  removeImage(id) {
-    let { images } = this;
-    this.changeData(() => {
-      images = images.filter(x => x.id !== id);
-    });
-  }
-
   getImageRect(id) {
     const { images } = this;
-    const image = images.find(x => x.id === id);
+    const image = images.get(id);
     const scr = new CellRange(
       image.cellRange.sc.ri,
       image.cellRange.sc.ci,
@@ -1252,7 +1240,7 @@ export default class DataProxy {
 
   getChartRect(id) {
     const { charts } = this;
-    const chart = charts.find(x => x.id === id);
+    const chart = charts.get(id);
     const scr = new CellRange(
       chart.cellRange.sc.ri,
       chart.cellRange.sc.ci,
@@ -1260,20 +1248,6 @@ export default class DataProxy {
       chart.cellRange.sc.ci,
     );
     return this.getRect(scr);
-  }
-
-  addChart(chart) {
-    const { charts } = this;
-    this.changeData(() => {
-      charts.push(chart);
-    });
-  }
-
-  removeChart(id) {
-    let { charts } = this;
-    this.changeData(() => {
-      charts = charts.filter(x => x.id !== id);
-    });
   }
 
   changeData(cb) {
@@ -1292,6 +1266,10 @@ export default class DataProxy {
         this.freeze = [y, x];
       } else if (property === 'autofilter') {
         this.autoFilter.setData(d[property]);
+      } else if (property === 'images') {
+        this.images = d[property];
+      } else if (property === 'charts') {
+        this.charts = d[property];
       } else if (d[property] !== undefined) {
         this[property] = d[property];
       }

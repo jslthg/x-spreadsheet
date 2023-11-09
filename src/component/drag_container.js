@@ -94,8 +94,8 @@ export default class DragContainer extends Element {
       this.selected();
     }, 100);
 
-    this.contextMenu.itemClick = (type) => {
-      this.menuClick(type);
+    this.contextMenu.itemClick = (t) => {
+      this.menuClick(t);
     };
 
     this.resize = () => {};
@@ -103,10 +103,15 @@ export default class DragContainer extends Element {
   }
 
   menuClick(type) {
-    const { el } = this;
+    const { el, dp } = this;
     if (type === 'delete') {
       const overEl = this.parent();
       overEl.removeChild(el);
+      if (this.hasClass('image')) {
+        dp.images.delete(this.getId());
+      } else if (this.hasClass('chart')) {
+        dp.charts.delete(this.getId());
+      }
     }
   }
 
@@ -234,10 +239,10 @@ export default class DragContainer extends Element {
     };
 
     // 释放鼠标
-    document.onmouseup = function (e) { // 当鼠标弹起来的时候不再移动
+    document.onmouseup = function () {
       that.resize(that);
       this.onmousemove = null;
-      this.onmouseup = null; // 预防鼠标弹起来后还会循环（即预防鼠标放上去的时候还会移动）
+      this.onmouseup = null;
     };
   }
 
@@ -275,10 +280,10 @@ export default class DragContainer extends Element {
         that.offset({ left: colWidth, top: rowHeight });
       };
       // 释放鼠标
-      document.onmouseup = function (e) { // 当鼠标弹起来的时候不再移动
+      document.onmouseup = function () {
         that.move(that);
         this.onmousemove = null;
-        this.onmouseup = null; // 预防鼠标弹起来后还会循环（即预防鼠标放上去的时候还会移动）
+        this.onmouseup = null;
       };
     }
     ev.stopPropagation();

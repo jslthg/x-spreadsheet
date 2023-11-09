@@ -20,12 +20,9 @@ import SortFilter from './sort_filter';
 import { xtoast } from './message';
 import { cssPrefix } from '../config';
 import { formulas } from '../core/formula';
-import Image from '../core/image';
-import Chart from '../core/chart';
 import ModalCharts from './modal_charts';
 import DragContainer from './drag_container';
 import testimg from '../../assets/1.jpg';
-import { guid } from '../utils/guid';
 /**
  * @desc throttle fn
  * @param func function
@@ -807,25 +804,28 @@ function sheetInitEvents() {
     const ec = data.getCellRectByXY(left + 400, top + 300);
     const cellRange = { sc: { ri: sc.ri, ci: sc.ci }, ec: { ri: ec.ri, ci: ec.ci } };
 
-    data.addChart(
-      new Chart(
-        dc.getId(), 'bar',
+    data.charts.insert(dc.getId(),
+      {
+        id: dc.getId(),
+        chartType: 'bar',
         option,
         left,
-        top, 400, 300, cellRange,
-      ),
-    );
+        top,
+        width: 400,
+        height: 300,
+        cellRange,
+      });
 
     dc.resize = (r) => {
       myChart.resize();
-      const t = data.charts.find(x => x.id === r.getId());
+      const t = data.charts.get(r.getId());
       if (t != null && t !== undefined) {
         Object.assign(t, r.offset());
       }
     };
 
     dc.move = (r) => {
-      const t = data.charts.find(x => x.id === r.getId());
+      const t = data.charts.get(r.getId());
 
       if (t != null && t !== undefined) {
         const o = r.offset();
@@ -1172,18 +1172,25 @@ export default class Sheet {
       const ec = data.getCellRectByXY(left + image.width, top + image.height);
       const cellRange = { sc: { ri: sc.ri, ci: sc.ci }, ec: { ri: ec.ri, ci: ec.ci } };
 
-      data.addImage(
-        new Image(dc.getId(), testimg, left, top, image.width, image.height, cellRange),
-      );
+      data.images.insert(dc.getId(),
+        {
+          id: dc.getId(),
+          src: testimg,
+          left,
+          top,
+          width: image.width,
+          height: image.height,
+          cellRange,
+        });
 
       dc.resize = (r) => {
-        const t = data.images.find(x => x.id === r.getId());
+        const t = data.images.get(r.getId());
         if (t != null && t !== undefined) {
           Object.assign(t, r.offset());
         }
       };
       dc.move = (r) => {
-        const t = data.images.find(x => x.id === r.getId());
+        const t = data.images.get(r.getId());
 
         if (t != null && t !== undefined) {
           const o = r.offset();
