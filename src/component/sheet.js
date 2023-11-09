@@ -1,6 +1,6 @@
 /* global window */
 import * as echarts from 'echarts';
-import { h } from './element';
+import { Element, h } from './element';
 import {
   bind,
   mouseMoveUp,
@@ -21,6 +21,7 @@ import { xtoast } from './message';
 import { cssPrefix } from '../config';
 import { formulas } from '../core/formula';
 import Image from '../core/image';
+import Chart from '../core/chart';
 import ModalCharts from './modal_charts';
 import DragContainer from './drag_container';
 import testimg from '../../assets/1.jpg';
@@ -52,7 +53,7 @@ function scrollbarMove() {
     l, t, left, top, width, height,
   } = data.getSelectedRect();
   const tableOffset = this.getTableOffset();
-  // console.log(',l:', l, ', left:', left, ', tOffset.left:', tableOffset.width);
+  console.log('sheet.scrollbarMove,l:', l, ', left:', left, ', tOffset.left:', tableOffset.width);
   if (Math.abs(left) + width > tableOffset.width) {
     horizontalScrollbar.move({ left: l + width - tableOffset.width });
   } else {
@@ -352,7 +353,8 @@ function paste(what, evt) {
     const eventTrigger = (rows) => {
       this.trigger('pasted-clipboard', rows);
     };
-    // pastFromSystemClipboard is async operation, need to tell it how to reset sheet and trigger event after it finishes
+    // pastFromSystemClipboard is async operation,
+    //  need to tell it how to reset sheet and trigger event after it finishes
     // pasting content from system clipboard
     data.pasteFromSystemClipboard(resetSheet, eventTrigger);
   } else if (data.paste(what, msg => xtoast('Tip', msg))) {
@@ -470,12 +472,33 @@ function editorSet() {
   editor.setCell(data.getSelectedCell(), data.getSelectedValidator());
   clearClipboard.call(this);
 }
+function dragContainerSetOffset() {
+  const { data, overlayerCEl } = this;
 
+  overlayerCEl.children().forEach((x) => {
+    const n = new Element(x);
+    if (n.hasClass(`${cssPrefix}-drag-container`)) {
+      const id = n.attr('id');
+      let sOffset;
+      if (n.hasClass('chart')) {
+        sOffset = data.getChartRect(id);
+      } else {
+        sOffset = data.getImageRect(id);
+      }
+      const offset = {
+        top: sOffset.top - sOffset.scroll.y,
+        left: sOffset.left - sOffset.scroll.x + sOffset.width,
+      };
+      n.offset(offset);
+    }
+  });
+}
 function verticalScrollbarMove(distance) {
   const { data, table, selector } = this;
   data.scrolly(distance, () => {
     selector.resetBRLAreaOffset();
     editorSetOffset.call(this);
+    dragContainerSetOffset.call(this);
     table.render();
   });
 }
@@ -485,6 +508,7 @@ function horizontalScrollbarMove(distance) {
   data.scrollx(distance, () => {
     selector.resetBRTAreaOffset();
     editorSetOffset.call(this);
+    dragContainerSetOffset.call(this);
     table.render();
   });
 }
@@ -749,13 +773,11 @@ function sheetInitEvents() {
    * modal  click ok button
    * @param t
    */
-  modalCharts.ok = (t) => {
-    const { data } = this;
+  modalCharts.ok = () => {
+    const { data, table } = this;
     const { left, top } = data.getSelectedRect();
     const chart = h('div', 'chart');
-    const id = guid();
-    chart.attr('id', id);
-    const dc = new DragContainer(chart, left, top);
+    const dc = new DragContainer(data, chart, left, top, 400, 300, 'chart');
     this.overlayerCEl.child(dc.el);
 
     const myChart = echarts.init(chart.el);
@@ -781,7 +803,50 @@ function sheetInitEvents() {
 
     myChart.setOption(option);
 
-    dc.resize = () => { myChart.resize(); };
+    const sc = data.getCellRectByXY(left, top);
+    const ec = data.getCellRectByXY(left + 400, top + 300);
+    const cellRange = { sc: { ri: sc.ri, ci: sc.ci }, ec: { ri: ec.ri, ci: ec.ci } };
+
+    data.addChart(
+      new Chart(
+        dc.getId(), 'bar',
+        option,
+        left,
+        top, 400, 300, cellRange,
+      ),
+    );
+
+    dc.resize = (r) => {
+      myChart.resize();
+      const t = data.charts.find(x => x.id === r.getId());
+      if (t != null && t !== undefined) {
+        Object.assign(t, r.offset());
+      }
+    };
+
+    dc.move = (r) => {
+      const t = data.charts.find(x => x.id === r.getId());
+
+      if (t != null && t !== undefined) {
+        const o = r.offset();
+        const sc2 = data.getCellRectByXY(o.left, o.top);
+        const ec2 = data.getCellRectByXY(o.left + t.width, o.top + t.height);
+        Object.assign(t,
+          {
+            top: o.top,
+            left: o.left,
+            cellRange:
+                  {
+                    sc: { ri: sc2.ri, ci: sc2.ci },
+                    ec: { ri: ec2.ri, ci: ec2.ci },
+                  },
+          });
+      }
+    };
+
+    sheetReset.call(this);
+    // 刷新显示
+    table.render();
   };
 
   bind(window, 'resize', () => {
@@ -1093,27 +1158,52 @@ export default class Sheet {
 
   image() {
     // 将图片上传到指定的服务器。
-    const { data } = this;
+    const { data, table } = this;
     const { left, top } = data.getSelectedRect();
     const image = new window.Image();
     image.src = testimg;
     image.onload = () => {
       const img = h('div', 'image')
         .children(h('img', '').attr('src', testimg));
-      const dc = new DragContainer(img, left, top, image.width, image.height);
+      const dc = new DragContainer(data, img, left, top, image.width, image.height);
       this.overlayerCEl.child(dc.el);
-      // dc.selected = () => { console.log(5555); };
-      // const eldc = window.document.getElementById(dc.getId());
-      // console.log('id', dc.getId(), eldc);
-      // this.el.child(dc);
-      // dc.active();
-      // 其实是设置该单元格 type: 'image'， value: imageUrl，在后面进行渲染。
-      // 因为 setSelectedCellAttr 只能设置一个值，所以这里需要先设置 type，再设置 value。
-      // 因为原渲染内容使用 text，我们既需要地址，又不像渲染 text，所以使用 value。
-      // data.setSelectedCellAttr('type', 'image'); // 设置类型，方便后面的渲染。
-      // data.setSelectedCellAttr('value', testimg); // 设置图片地址。方面后面使用地址渲染。
-      data.addImage(new Image(dc.getId(), testimg, left, top, image.width, image.height));
+
+      const sc = data.getCellRectByXY(left, top);
+      const ec = data.getCellRectByXY(left + image.width, top + image.height);
+      const cellRange = { sc: { ri: sc.ri, ci: sc.ci }, ec: { ri: ec.ri, ci: ec.ci } };
+
+      data.addImage(
+        new Image(dc.getId(), testimg, left, top, image.width, image.height, cellRange),
+      );
+
+      dc.resize = (r) => {
+        const t = data.images.find(x => x.id === r.getId());
+        if (t != null && t !== undefined) {
+          Object.assign(t, r.offset());
+        }
+      };
+      dc.move = (r) => {
+        const t = data.images.find(x => x.id === r.getId());
+
+        if (t != null && t !== undefined) {
+          const o = r.offset();
+          const sc2 = data.getCellRectByXY(o.left, o.top);
+          const ec2 = data.getCellRectByXY(o.left + t.width, o.top + t.height);
+          Object.assign(t,
+            {
+              top: o.top,
+              left: o.left,
+              cellRange:
+                  {
+                    sc: { ri: sc2.ri, ci: sc2.ci },
+                    ec: { ri: ec2.ri, ci: ec2.ci },
+                  },
+            });
+        }
+      };
       sheetReset.call(this);
+      // 刷新显示
+      table.render();
     };
   }
 

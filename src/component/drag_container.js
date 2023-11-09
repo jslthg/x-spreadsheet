@@ -34,12 +34,11 @@ function buildMenu(defaultMenus = []) {
 }
 
 class DragMenu {
-  constructor(viewFn, defaultMenus = []) {
+  constructor(defaultMenus = []) {
     this.menuItems = buildMenu.call(this, defaultMenus);
     this.el = h('div', `${cssPrefix}-drag-menu`)
       .children(...this.menuItems)
       .hide();
-    this.viewFn = viewFn;
     this.itemClick = () => {};
   }
 
@@ -53,27 +52,21 @@ class DragMenu {
   setPosition(x, y) {
     const { el } = this;
     el.show();
-    const view = this.viewFn;
-    el.css('left', `${x - view.left - 60}px`);
-    el.css('top', `${y - view.top - 60}px`);
+    el.css('left', `${x}px`);
+    el.css('top', `${y}px`);
 
     bindClickoutside(el);
   }
 }
 
 export default class DragContainer extends Element {
-  constructor(domEl, left = 0, top = 0, width = 0, height = 0) {
-    // const { clientHeight, clientWidth } = document.documentElement;
-    // const left = (clientWidth - width) / 2;
-    // const top = (clientHeight - height) / 3;
-    if (width <= 0 || height <= 0) {
-      width = 400;
-      height = 300;
-    }
-    super('div', `${cssPrefix}-drag-container`);
-    this.attr('id', guid());
-
-    this.contextMenu = new DragMenu({ left, top });
+  constructor(dp, domEl, left = 0, top = 0, width = 400, height = 300, type = 'image') {
+    super('div', `${cssPrefix}-drag-container ${type}`);
+    const id = guid();
+    this.attr('id', id);
+    domEl.attr('id', `${id}_cm`);
+    this.dp = dp;
+    this.contextMenu = new DragMenu();
     this.children(
       h('div', `drag-content`).children(domEl)
         .on('mousedown', e => this.onMousedown(e)),
@@ -91,13 +84,10 @@ export default class DragContainer extends Element {
       this.contextMenu.el,
     );
 
-    const css = {
-      left: `${left}px`,
-      top: `${top}px`,
-    };
 
-    Object.assign(css, { height: `${height}px`, width: `${width}px` });
-    this.css(css);
+    this.offset({
+      left, top, height, width,
+    });
     this.on('click', () => { this.selected(); });
     // 默认选择当前
     setTimeout(() => {
@@ -109,6 +99,7 @@ export default class DragContainer extends Element {
     };
 
     this.resize = () => {};
+    this.move = () => {};
   }
 
   menuClick(type) {
@@ -145,19 +136,19 @@ export default class DragContainer extends Element {
     }
     ev.preventDefault();
     const that = this;
-    const { el } = this;
+    const s = this.offset();
     // 获取左上角坐标
-    const elTlx = el.offsetLeft;
-    const elTly = el.offsetTop;
+    const elTlx = s.left;
+    const elTly = s.top;
     // 获取右上角坐标
-    const elTrx = el.offsetLeft + el.offsetWidth;
-    const elTry = el.offsetTop;
+    const elTrx = s.left + s.width;
+    const elTry = s.top;
     // 获取左下角坐标
-    const elBlx = el.offsetLeft;
-    const elBly = el.offsetTop + el.offsetHeight;
+    const elBlx = s.left;
+    const elBly = s.top + s.height;
     // 获取右下角坐标
-    const elBrx = el.offsetLeft + el.offsetWidth;
-    const elBry = el.offsetTop + el.offsetHeight;
+    const elBrx = s.left + s.width;
+    const elBry = s.top + s.height;
 
     const minOffset = 20;
     document.onmousemove = function (e) {
@@ -172,17 +163,17 @@ export default class DragContainer extends Element {
         }
         const width = elBrx - left;
         const height = elBry - top;
-        el.style.width = `${width}px`;
-        el.style.height = `${height}px`;
-        el.style.left = `${left}px`;
-        el.style.top = `${top}px`;
+        that.offset({
+          left, top, width, height,
+        });
       } else if (type === 'tc') {
         if (top > elBly - minOffset) {
           top = elBly - minOffset;
         }
         const height = elBly - top;
-        el.style.height = `${height}px`;
-        el.style.top = `${top}px`;
+        that.offset({
+          top, height,
+        });
       } else if (type === 'tr') {
         if (left < elBlx + minOffset) {
           left = elBlx + minOffset;
@@ -192,23 +183,25 @@ export default class DragContainer extends Element {
         }
         const width = left - elBlx;
         const height = elBly - top;
-        el.style.width = `${width}px`;
-        el.style.height = `${height}px`;
-        el.style.left = `${elBlx}px`;
-        el.style.top = `${top}px`;
+        that.offset({
+          top, width, height,
+        });
       } else if (type === 'ml') {
         if (left > elBrx - minOffset) {
           left = elBrx - minOffset;
         }
         const width = elBrx - left;
-        el.style.width = `${width}px`;
-        el.style.left = `${left}px`;
+        that.offset({
+          left, width,
+        });
       } else if (type === 'mr') {
         if (left < elBlx + minOffset) {
           left = elBlx + minOffset;
         }
         const width = left - elBlx;
-        el.style.width = `${width}px`;
+        that.offset({
+          width,
+        });
       } else if (type === 'bl') {
         if (left > elTrx - minOffset) {
           left = elTrx - minOffset;
@@ -218,16 +211,15 @@ export default class DragContainer extends Element {
         }
         const width = elTrx - left;
         const height = top - elTry;
-        el.style.width = `${width}px`;
-        el.style.height = `${height}px`;
-        el.style.left = `${left}px`;
-        el.style.top = `${elTry}px`;
+        that.offset({
+          left, width, height,
+        });
       } else if (type === 'bc') {
         if (top < elTly + minOffset) {
           top = elTly + minOffset;
         }
         const height = top - elTly;
-        el.style.height = `${height}px`;
+        that.offset({ height });
       } else if (type === 'br') {
         if (left < elTlx + minOffset) {
           left = elTlx + minOffset;
@@ -237,14 +229,13 @@ export default class DragContainer extends Element {
         }
         const width = left - elTlx;
         const height = top - elTly;
-        el.style.width = `${width}px`;
-        el.style.height = `${height}px`;
+        that.offset({ width, height });
       }
     };
 
     // 释放鼠标
     document.onmouseup = function (e) { // 当鼠标弹起来的时候不再移动
-      that.resize();
+      that.resize(that);
       this.onmousemove = null;
       this.onmouseup = null; // 预防鼠标弹起来后还会循环（即预防鼠标放上去的时候还会移动）
     };
@@ -254,13 +245,15 @@ export default class DragContainer extends Element {
     if (!this.hasClass('active')) {
       return;
     }
+    const that = this;
     const { el, contextMenu } = this;
     const diffX = ev.clientX - el.offsetLeft;
     const diffY = ev.clientY - el.offsetTop;
 
     contextMenu.hide();
     if (ev.button === 2) {
-      contextMenu.setPosition(ev.clientX, ev.clientY);
+      const { left, top } = this.offset();
+      contextMenu.setPosition(ev.clientX - left - 60, ev.clientY - top - 60);
     } else {
       document.onmousemove = function (e) {
         let left = e.clientX - diffX;
@@ -278,17 +271,37 @@ export default class DragContainer extends Element {
           top = window.innerHeight - el.offsetHeight;
         }
 
-        // 移动时重新得到物体的距离，解决拖动时出现晃动的现象
-        el.style.left = `${left}px`;
-        el.style.top = `${top}px`;
+        const { rowHeight, colWidth } = that.getFirstCell(left, top);
+        that.offset({ left: colWidth, top: rowHeight });
       };
       // 释放鼠标
       document.onmouseup = function (e) { // 当鼠标弹起来的时候不再移动
+        that.move(that);
         this.onmousemove = null;
         this.onmouseup = null; // 预防鼠标弹起来后还会循环（即预防鼠标放上去的时候还会移动）
       };
     }
     ev.stopPropagation();
+  }
+
+  getFirstCell(left, top) {
+    const { dp } = this;
+    const firstCell = dp.getCellRectByXY(left, top);
+    let fr = 0; let fc = 0;
+    if (firstCell.ri > 0) {
+      fr = firstCell.ri;
+    }
+    if (firstCell.ci > 0) {
+      fc = firstCell.ci;
+    }
+    let rowHeight = 0; let colWidth = 0;
+    for (let i = 0; i <= fr; i += 1) {
+      rowHeight += dp.rows.getHeight(i);
+    }
+    for (let i = 0; i <= fc; i += 1) {
+      colWidth += dp.cols.getWidth(i);
+    }
+    return { rowHeight, colWidth };
   }
 
   /**

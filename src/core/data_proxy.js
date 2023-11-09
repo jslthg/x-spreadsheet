@@ -1238,6 +1238,30 @@ export default class DataProxy {
     });
   }
 
+  getImageRect(id) {
+    const { images } = this;
+    const image = images.find(x => x.id === id);
+    const scr = new CellRange(
+      image.cellRange.sc.ri,
+      image.cellRange.sc.ci,
+      image.cellRange.sc.ri,
+      image.cellRange.sc.ci,
+    );
+    return this.getRect(scr);
+  }
+
+  getChartRect(id) {
+    const { charts } = this;
+    const chart = charts.find(x => x.id === id);
+    const scr = new CellRange(
+      chart.cellRange.sc.ri,
+      chart.cellRange.sc.ci,
+      chart.cellRange.sc.ri,
+      chart.cellRange.sc.ci,
+    );
+    return this.getRect(scr);
+  }
+
   addChart(chart) {
     const { charts } = this;
     this.changeData(() => {

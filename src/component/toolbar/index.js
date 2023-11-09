@@ -173,7 +173,7 @@ export default class Toolbar {
       [
         this.chartEl = new Chart(),
         this.imageEl = new Image(),
-        this.qrcodeEl = new Qrcode(),
+        // this.qrcodeEl = new Qrcode(),
         this.setupEl = new Setup(),
         this.printEl = new Print(),
       ],
