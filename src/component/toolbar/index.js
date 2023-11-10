@@ -34,7 +34,7 @@ import Chart from './chart';
 import Image from './image';
 import Qrcode from './qrcode';
 import Setup from './setup';
-import Bias from './bias';
+import Slash from './slash';
 
 function buildDivider() {
   return h('div', `${cssPrefix}-toolbar-divider`);
@@ -118,10 +118,10 @@ export default class Toolbar {
     this.isHide = isHide;
     const style = data.defaultStyle();
     this.items = [
-      [
-        this.viewEl = new View(),
-      ],
-      buildDivider(),
+      // [
+      //   this.viewEl = new View(),
+      // ],
+      // buildDivider(),
       [
         this.saveEl = new Save(),
         this.undoEl = new Undo(),
@@ -167,7 +167,7 @@ export default class Toolbar {
       ],
       buildDivider(),
       [
-        this.biasEl = new Bias(),
+        this.slashEl = new Slash(),
       ],
       buildDivider(),
       [

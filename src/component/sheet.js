@@ -23,6 +23,7 @@ import { formulas } from '../core/formula';
 import ModalCharts from './modal_charts';
 import DragContainer from './drag_container';
 import testimg from '../../assets/1.jpg';
+import ModalSlash from './modal_slash';
 /**
  * @desc throttle fn
  * @param func function
@@ -606,9 +607,9 @@ function toolbarChange(type, value) {
   } else if (type === 'image') {
     this.image();
   } else if (type === 'chart') {
-    this.showModalCharts();
-  } else if (type === 'bias') {
-    console.log('toolbarChange.bias');
+    this.modalCharts.show();
+  } else if (type === 'slash') {
+    this.modalSlash.show();
   } else if (type === 'print') {
     this.print.preview();
   } else if (type === 'paintformat') {
@@ -659,6 +660,7 @@ function sheetInitEvents() {
     modalValidation,
     sortFilter,
     modalCharts,
+    modalSlash,
   } = this;
   // overlayer
   overlayerEl
@@ -766,6 +768,9 @@ function sheetInitEvents() {
     }
   };
 
+  modalSlash.ok = (r) => {
+    console.log(r.input.val())
+  };
   /**
    * modal  click ok button
    * @param t
@@ -1052,7 +1057,9 @@ function renderImages() {
       const temp = images.getData()[key];
       const img = h('div', 'image')
         .children(h('img', '').attr('src', temp.src));
-      const dc = new DragContainer(temp.id, data, img, temp.left, temp.top, temp.width, temp.height);
+      const dc = new DragContainer(temp.id,
+        data, img, temp.left, temp.top, temp.width, temp.height);
+
       this.overlayerCEl.child(dc.el);
       sheetReset.call(this);
       // 刷新显示
@@ -1087,6 +1094,7 @@ export default class Sheet {
     // data validation
     this.modalValidation = new ModalValidation();
     this.modalCharts = new ModalCharts();
+    this.modalSlash = new ModalSlash();
     // contextMenu
     this.contextMenu = new ContextMenu(() => this.getRect(), !showContextmenu);
     // selector
@@ -1111,6 +1119,7 @@ export default class Sheet {
       this.contextMenu.el,
       this.modalValidation.el,
       this.modalCharts.el,
+      this.modalSlash.el,
       this.sortFilter.el,
     );
     // table
@@ -1164,10 +1173,6 @@ export default class Sheet {
   save() {
     this.data.save();
     sheetReset.call(this);
-  }
-
-  showModalCharts() {
-    this.modalCharts.show();
   }
 
   image() {

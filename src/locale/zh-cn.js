@@ -147,4 +147,9 @@ export default {
       title: '添加图表',
     },
   },
+  slash: {
+    modal: {
+      title: '单元格斜线设置',
+    },
+  },
 };

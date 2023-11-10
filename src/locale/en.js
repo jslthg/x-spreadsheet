@@ -24,7 +24,7 @@ export default {
     autofilter: 'Filter',
     formula: 'Functions',
     more: 'More',
-    bias: 'Cell Bias',
+    bias: 'Cell Bias Line',
     picture: 'Picture',
     setup: 'Setup',
     qrcode: 'QR Code',
@@ -145,6 +145,11 @@ export default {
   charts: {
     modalCharts: {
       title: 'Charts Type List',
+    },
+  },
+  slash: {
+    modal: {
+      title: 'Cell Slash Setting',
     },
   },
 };

@@ -1204,6 +1204,88 @@ form fieldset {
   padding: .75em 1em;
 }
 
+.@{css-prefix}-modal-slash {
+  padding: 10px 20px;
+
+  .form-item {
+    box-sizing: border-box;
+    margin: 0 0 24px;
+    padding: 0;
+    color: #000000d9;
+    font-size: 14px;
+    font-variant: tabular-nums;
+    line-height: 1.5715;
+    list-style: none;
+    font-feature-settings: "tnum";
+    vertical-align: top;
+
+    .form-item-label {
+      padding: 0 0 8px;
+      line-height: 1.5715;
+      white-space: initial;
+      text-align: left;
+
+      label {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        max-width: 100%;
+        color: #000000d9;
+        font-size: 14px;
+      }
+    }
+
+    .form-item-control {
+      position: relative;
+      display: flex;
+      align-items: center;
+      min-height: 32px;
+      text-overflow: ellipsis;
+
+      .@{css-prefix}-form-field {
+        width: 100%;
+
+        .@{css-prefix}-form-input {
+          width: 100%;
+
+          input {
+            box-sizing: border-box;
+            margin: 0;
+            font-variant: tabular-nums;
+            list-style: none;
+            font-feature-settings: "tnum";
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            min-width: 0;
+            padding: 4px 11px;
+            color: #000000d9;
+            font-size: 14px;
+            line-height: 1.5715;
+            background-color: #fff;
+            background-image: none;
+            border: 1px solid #d9d9d9;
+            border-radius: 2px;
+            transition: all .3s;
+          }
+
+          input:hover {
+            border-color: #40a9ff;
+            border-right-width: 1px !important;
+          }
+
+          input:focus, .ant-input-focused {
+            border-color: #cbe6ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, .2);
+            border-right-width: 1px !important;
+            outline: 0;
+          }
+        }
+      }
+    }
+  }
+}
+
 @media screen and (min-width: 320px) and (max-width: 480px) {
   .@{css-prefix}-toolbar {
     display: none;
@@ -1464,7 +1546,7 @@ form fieldset {
       top: -3 * @icon-size;
     }
 
-    &.bias {
+    &.slash {
       left: -8 * @icon-size;
       top: -3 * @icon-size;
     }
