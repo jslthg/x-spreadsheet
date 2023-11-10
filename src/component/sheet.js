@@ -774,7 +774,7 @@ function sheetInitEvents() {
     const { data, table } = this;
     const { left, top } = data.getSelectedRect();
     const chart = h('div', 'chart');
-    const dc = new DragContainer(data, chart, left, top, 400, 300, 'chart');
+    const dc = new DragContainer('', data, chart, left, top, 400, 300, 'chart');
     this.overlayerCEl.child(dc.el);
 
     const myChart = echarts.init(chart.el);
@@ -1033,7 +1033,7 @@ function renderCharts() {
     if (key !== 'len') {
       const temp = charts.getData()[key];
       const chart = h('div', 'chart');
-      const dc = new DragContainer(data, chart, temp.left, temp.top, temp.width, temp.height, 'chart');
+      const dc = new DragContainer(temp.id, data, chart, temp.left, temp.top, temp.width, temp.height, 'chart');
       this.overlayerCEl.child(dc.el);
       const myChart = echarts.init(chart.el);
       myChart.setOption(temp.option);
@@ -1052,7 +1052,7 @@ function renderImages() {
       const temp = images.getData()[key];
       const img = h('div', 'image')
         .children(h('img', '').attr('src', temp.src));
-      const dc = new DragContainer(data, img, temp.left, temp.top, temp.width, temp.height);
+      const dc = new DragContainer(temp.id, data, img, temp.left, temp.top, temp.width, temp.height);
       this.overlayerCEl.child(dc.el);
       sheetReset.call(this);
       // 刷新显示
@@ -1179,7 +1179,7 @@ export default class Sheet {
     image.onload = () => {
       const img = h('div', 'image')
         .children(h('img', '').attr('src', testimg));
-      const dc = new DragContainer(data, img, left, top, image.width, image.height);
+      const dc = new DragContainer('', data, img, left, top, image.width, image.height);
       this.overlayerCEl.child(dc.el);
 
       const sc = data.getCellRectByXY(left, top);

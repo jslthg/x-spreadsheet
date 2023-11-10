@@ -80,6 +80,7 @@ const defaultSettings = {
   showToolbar: true,
   showContextmenu: true,
   showBottomBar: true,
+  showFixedHeaders: true,
   row: {
     len: 100,
     height: 25,

@@ -194,12 +194,17 @@ function renderSelectedHeaderCell(x, y, w, h) {
 // ty: moving distance on y-axis
 function renderFixedHeaders(type, viewRange, w, h, tx, ty) {
   const { draw, data } = this;
+  const { settings } = data;
   const sumHeight = viewRange.h; // rows.sumHeight(viewRange.sri, viewRange.eri + 1);
   const sumWidth = viewRange.w; // cols.sumWidth(viewRange.sci, viewRange.eci + 1);
   const nty = ty + h;
   const ntx = tx + w;
 
   draw.save();
+  if (!settings.showFixedHeaders) {
+    draw.restore();
+    return;
+  }
   // draw rect background
   draw.attr(tableFixedHeaderCleanStyle);
   if (type === 'all' || type === 'left') draw.fillRect(0, nty, w, sumHeight);
@@ -256,8 +261,14 @@ function renderFixedHeaders(type, viewRange, w, h, tx, ty) {
 }
 
 function renderFixedLeftTopCell(fw, fh) {
-  const { draw } = this;
+  const { draw, data } = this;
+  const { settings } = data;
   draw.save();
+
+  if (!settings.showFixedHeaders) {
+    draw.restore();
+    return;
+  }
   // left-top-cell
   draw.attr({ fillStyle: '#f4f5f8' })
     .fillRect(0, 0, fw, fh);

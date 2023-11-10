@@ -105,9 +105,12 @@ function changeData(left, top) {
 
 
 export default class DragContainer extends Element {
-  constructor(dp, domEl, left = 0, top = 0, width = 400, height = 300, type = 'image') {
+  constructor(id_ = '', dp, domEl, left = 0, top = 0, width = 400, height = 300, type = 'image') {
     super('div', `${cssPrefix}-drag-container ${type}`);
-    const id = helper.guid();
+    let id = id_;
+    if (id_ === '') {
+      id = helper.guid();
+    }
     this.attr('id', id);
     domEl.attr('id', `${id}_cm`);
     this.dp = dp;
