@@ -1259,17 +1259,14 @@ export default class DataProxy {
   setData(d) {
     Object.keys(d).forEach((property) => {
       if (property === 'merges' || property === 'rows'
-        || property === 'cols' || property === 'validations') {
+          || property === 'cols' || property === 'images'
+        || property === 'charts' || property === 'validations') {
         this[property].setData(d[property]);
       } else if (property === 'freeze') {
         const [x, y] = expr2xy(d[property]);
         this.freeze = [y, x];
       } else if (property === 'autofilter') {
         this.autoFilter.setData(d[property]);
-      } else if (property === 'images') {
-        this.images = d[property];
-      } else if (property === 'charts') {
-        this.charts = d[property];
       } else if (d[property] !== undefined) {
         this[property] = d[property];
       }
@@ -1285,8 +1282,8 @@ export default class DataProxy {
       name,
       freeze: xy2expr(freeze[1], freeze[0]),
       styles,
-      images,
-      charts,
+      images: images.getData(),
+      charts: charts.getData(),
       merges: merges.getData(),
       rows: rows.getData(),
       cols: cols.getData(),

@@ -1,9 +1,9 @@
 /* eslint-env browser */
 import { Element, h } from './element';
 import { cssPrefix } from '../config';
-import { guid } from '../utils/guid';
 import { tf } from '../locale/locale';
 import { bindClickoutside, unbindClickoutside } from './event';
+import helper from '../core/helper';
 
 
 const menuItems = [
@@ -60,7 +60,8 @@ class DragMenu {
 }
 
 
-const getMoveOffset = (el, e, diffX, diffY) => {
+function getMoveOffset(e, diffX, diffY) {
+  const { el } = this;
   let left = e.clientX - diffX;
   let top = e.clientY - diffY;
 
@@ -75,16 +76,16 @@ const getMoveOffset = (el, e, diffX, diffY) => {
     top = window.innerHeight - el.offsetHeight;
   }
   return { left, top };
-};
+}
 
-const changeData = (dg, left, top) => {
-  const { dp } = dg;
+function changeData(left, top) {
+  const { dp } = this;
   let t;
   // 更新dp内部数据
-  if (dg.hasClass('chart')) {
-    t = dp.charts.get(dg.getId());
-  } else if (dg.hasClass('image')) {
-    t = dp.images.get(dg.getId());
+  if (this.hasClass('chart')) {
+    t = dp.charts.get(this.getId());
+  } else if (this.hasClass('image')) {
+    t = dp.images.get(this.getId());
   }
   if (t != null && t !== undefined) {
     const sc2 = dp.getCellRectByXY(left, top);
@@ -100,13 +101,13 @@ const changeData = (dg, left, top) => {
               },
       });
   }
-};
+}
 
 
 export default class DragContainer extends Element {
   constructor(dp, domEl, left = 0, top = 0, width = 400, height = 300, type = 'image') {
     super('div', `${cssPrefix}-drag-container ${type}`);
-    const id = guid();
+    const id = helper.guid();
     this.attr('id', id);
     domEl.attr('id', `${id}_cm`);
     this.dp = dp;
@@ -185,7 +186,6 @@ export default class DragContainer extends Element {
     }
     ev.preventDefault();
     const that = this;
-    const { dp } = this;
     const s = this.offset();
     // 获取左上角坐标
     const elTlx = s.left;
@@ -290,7 +290,7 @@ export default class DragContainer extends Element {
       that.offset({ left: colWidth, top: rowHeight });
       // 更新dp内部数据
 
-      changeData(that, colWidth, rowHeight);
+      changeData.call(that, colWidth, rowHeight);
 
       that.resize(that);
       this.onmousemove = null;
@@ -303,7 +303,7 @@ export default class DragContainer extends Element {
       return;
     }
     const that = this;
-    const { el, contextMenu, dp } = this;
+    const { el, contextMenu } = this;
     const diffX = ev.clientX - el.offsetLeft;
     const diffY = ev.clientY - el.offsetTop;
 
@@ -313,17 +313,17 @@ export default class DragContainer extends Element {
       contextMenu.setPosition(ev.clientX - left - 60, ev.clientY - top - 60);
     } else {
       document.onmousemove = function (e) {
-        const { left, top } = getMoveOffset(el, e, diffX, diffY);
+        const { left, top } = getMoveOffset.call(that, e, diffX, diffY);
         that.offset({ left, top });
       };
       // 释放鼠标
       document.onmouseup = function (e) {
-        const { left, top } = getMoveOffset(el, e, diffX, diffY);
+        const { left, top } = getMoveOffset.call(that, e, diffX, diffY);
         const { rowHeight, colWidth } = that.getFirstCell(left, top);
         that.offset({ left: colWidth, top: rowHeight });
 
         // 更新dp内部数据
-        changeData(that, colWidth, rowHeight);
+        changeData.call(that, colWidth, rowHeight);
 
         that.move(that);
         this.onmousemove = null;

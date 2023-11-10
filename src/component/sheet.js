@@ -1026,6 +1026,40 @@ function sheetInitEvents() {
   });
 }
 
+function renderCharts() {
+  const { data, table } = this;
+  const { charts } = data;
+  Object.keys(charts.getData()).forEach((key) => {
+    if (key !== 'len') {
+      const temp = charts.getData()[key];
+      const chart = h('div', 'chart');
+      const dc = new DragContainer(data, chart, temp.left, temp.top, temp.width, temp.height, 'chart');
+      this.overlayerCEl.child(dc.el);
+      const myChart = echarts.init(chart.el);
+      myChart.setOption(temp.option);
+
+      sheetReset.call(this);
+      // 刷新显示
+      table.render();
+    }
+  });
+}
+function renderImages() {
+  const { data, table } = this;
+  const { images } = data;
+  Object.keys(images.getData()).forEach((key) => {
+    if (key !== 'len') {
+      const temp = images.getData()[key];
+      const img = h('div', 'image')
+        .children(h('img', '').attr('src', temp.src));
+      const dc = new DragContainer(data, img, temp.left, temp.top, temp.width, temp.height);
+      this.overlayerCEl.child(dc.el);
+      sheetReset.call(this);
+      // 刷新显示
+      table.render();
+    }
+  });
+}
 export default class Sheet {
   constructor(targetEl, data) {
     this.eventMap = createEventEmitter();
@@ -1108,6 +1142,9 @@ export default class Sheet {
     this.print.resetData(data);
     this.selector.resetData(data);
     this.table.resetData(data);
+
+    renderImages.call(this);
+    renderCharts.call(this);
   }
 
   loadData(data) {

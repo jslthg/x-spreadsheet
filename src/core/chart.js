@@ -1,15 +1,4 @@
 
-// constructor(id, chartType, option, left, top, width, height, cellRange, url) {
-//   this.id = id;
-//   this.chartType = chartType;
-//   this.option = option;
-//   this.url = url;
-//   this.left = left;
-//   this.top = top;
-//   this.width = width;
-//   this.height = height;
-//   this.cellRange = cellRange;
-// }
 export default class Charts {
   constructor(len) {
     this._ = {};
@@ -33,8 +22,8 @@ export default class Charts {
     return this._[id];
   }
 
-  insert(id, img = {}) {
-    this._[id] = img;
+  insert(id, chart = {}) {
+    this._[id] = chart;
     this.len += 1;
   }
 
