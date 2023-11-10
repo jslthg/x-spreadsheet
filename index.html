@@ -28,9 +28,9 @@
 <!--  <iframe src="https://ghbtns.com/github-btn.html?user=myliang&repo=x-spreadsheet&type=star&count=true&size=large" frameborder="0" scrolling="0" width="160px" height="30px"></iframe>-->
 <!--  </div>-->
   <div class="container">
-    <div class="left" >
-      <div id="drag" draggable="true">拖拽我</div>
-    </div>
+<!--    <div class="left" >-->
+<!--      <div id="drag" draggable="true">拖拽我</div>-->
+<!--    </div>-->
     <div id="x-spreadsheet-demo" class="right" ></div>
   </div>
   <script>
@@ -45,17 +45,17 @@
     //   // ev.target.appendChild(document.getElementById(data));
     // }
 
-    function dragstart_handler(ev) {
-      // Add the target element's id to the data transfer object
-      ev.dataTransfer.dropEffect = "copy";
-      ev.dataTransfer.setData("application/data-report", ev.target.innerText);
-    }
-    window.addEventListener("DOMContentLoaded", () => {
-      // Get the element by id
-      const element = document.getElementById("drag");
-      // Add the ondragstart event listener
-      element.addEventListener("dragstart", dragstart_handler);
-    });
+    // function dragstart_handler(ev) {
+    //   // Add the target element's id to the data transfer object
+    //   ev.dataTransfer.dropEffect = "copy";
+    //   ev.dataTransfer.setData("application/data-report", ev.target.innerText);
+    // }
+    // window.addEventListener("DOMContentLoaded", () => {
+    //   // Get the element by id
+    //   const element = document.getElementById("drag");
+    //   // Add the ondragstart event listener
+    //   element.addEventListener("dragstart", dragstart_handler);
+    // });
 
     function load(){
       const rows10 = { len: 1000 };
@@ -142,6 +142,81 @@
         //   ],
         //   merges: [
         //     'C3:D4',
+        //   ],
+        //   charts: [
+        //     {
+        //       id: 'b38b4dd4-0766-e653-d007-be4f97922bf6',
+        //       chartType: 'bar',
+        //       option: {
+        //         xAxis: {
+        //           type: 'category',
+        //           data: [
+        //             'Mon',
+        //             'Tue',
+        //             'Wed',
+        //             'Thu',
+        //             'Fri',
+        //             'Sat',
+        //             'Sun',
+        //           ],
+        //         },
+        //         yAxis: {
+        //           type: 'value',
+        //         },
+        //         series: [
+        //           {
+        //             data: [
+        //               120,
+        //               200,
+        //               150,
+        //               80,
+        //               70,
+        //               110,
+        //               130,
+        //             ],
+        //             type: 'bar',
+        //             showBackground: true,
+        //             backgroundStyle: {
+        //               color: 'rgba(180, 180, 180, 0.2)',
+        //             },
+        //           },
+        //         ],
+        //       },
+        //       left: 100,
+        //       top: 325,
+        //       width: 400,
+        //       height: 300,
+        //       cellRange: {
+        //         sc: {
+        //           ri: 12,
+        //           ci: 0,
+        //         },
+        //         ec: {
+        //           ri: 24,
+        //           ci: 3,
+        //         },
+        //       },
+        //     },
+        //   ],
+        //   images: [
+        //     {
+        //       id: '03341c05-63c5-08dd-cd4d-3d9987ae34c2',
+        //       src: 'c2b8e4cfd6ec52f7a3715d23062cf061.jpg',
+        //       left: 100,
+        //       top: 100,
+        //       width: 367,
+        //       height: 192,
+        //       cellRange: {
+        //         sc: {
+        //           ri: 3,
+        //           ci: 0,
+        //         },
+        //         ec: {
+        //           ri: 10,
+        //           ci: 3,
+        //         },
+        //       },
+        //     },
         //   ],
         //   cols: {
         //     len: 10,

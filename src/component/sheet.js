@@ -816,33 +816,10 @@ function sheetInitEvents() {
         cellRange,
       });
 
-    dc.resize = (r) => {
+    dc.resize = () => {
       myChart.resize();
-      const t = data.charts.get(r.getId());
-      if (t != null && t !== undefined) {
-        Object.assign(t, r.offset());
-      }
     };
 
-    dc.move = (r) => {
-      const t = data.charts.get(r.getId());
-
-      if (t != null && t !== undefined) {
-        const o = r.offset();
-        const sc2 = data.getCellRectByXY(o.left, o.top);
-        const ec2 = data.getCellRectByXY(o.left + t.width, o.top + t.height);
-        Object.assign(t,
-          {
-            top: o.top,
-            left: o.left,
-            cellRange:
-                  {
-                    sc: { ri: sc2.ri, ci: sc2.ci },
-                    ec: { ri: ec2.ri, ci: ec2.ci },
-                  },
-          });
-      }
-    };
 
     sheetReset.call(this);
     // 刷新显示
@@ -1183,31 +1160,6 @@ export default class Sheet {
           cellRange,
         });
 
-      dc.resize = (r) => {
-        const t = data.images.get(r.getId());
-        if (t != null && t !== undefined) {
-          Object.assign(t, r.offset());
-        }
-      };
-      dc.move = (r) => {
-        const t = data.images.get(r.getId());
-
-        if (t != null && t !== undefined) {
-          const o = r.offset();
-          const sc2 = data.getCellRectByXY(o.left, o.top);
-          const ec2 = data.getCellRectByXY(o.left + t.width, o.top + t.height);
-          Object.assign(t,
-            {
-              top: o.top,
-              left: o.left,
-              cellRange:
-                  {
-                    sc: { ri: sc2.ri, ci: sc2.ci },
-                    ec: { ri: ec2.ri, ci: ec2.ci },
-                  },
-            });
-        }
-      };
       sheetReset.call(this);
       // 刷新显示
       table.render();
