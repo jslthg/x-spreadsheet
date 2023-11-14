@@ -6,6 +6,7 @@ import Bottombar from './component/bottombar';
 import { cssPrefix } from './config';
 import { locale } from './locale/locale';
 import './index.less';
+import zhCn from "./locale/zh-cn";
 
 
 class Spreadsheet {

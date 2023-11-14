@@ -100,7 +100,7 @@ const defaultSettings = {
     underline: false,
     color: '#0a0a0a',
     font: {
-      name: 'Arial',
+      name: 'Microsoft YaHei',
       size: 10,
       bold: false,
       italic: false,

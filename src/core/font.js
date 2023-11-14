@@ -5,6 +5,14 @@ import './_.prototypes';
  * @type {BaseFont[]}
  */
 const baseFonts = [
+  { key: '宋体', title: '宋体' },
+  { key: '黑体', title: '黑体' },
+  { key: '仿宋', title: '仿宋' },
+  { key: '楷体', title: '楷体' },
+  { key: '隶书', title: '隶书' },
+  { key: '华文中宋', title: '华文中宋' },
+  { key: '华文行楷', title: '华文行楷' },
+  { key: 'Microsoft YaHei', title: 'Microsoft YaHei' },
   { key: 'Arial', title: 'Arial' },
   { key: 'Helvetica', title: 'Helvetica' },
   { key: 'Source Sans Pro', title: 'Source Sans Pro' },
