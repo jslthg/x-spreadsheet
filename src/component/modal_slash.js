@@ -40,4 +40,9 @@ export default class ModalSlash extends Modal {
     }
     this.hide();
   }
+
+  setValue(cell = null) {
+    const { input } = this;
+    input.val(cell != null ? cell.text : '');
+  }
 }

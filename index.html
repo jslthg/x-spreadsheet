@@ -125,111 +125,111 @@
           // ],
         }
       })
-        .loadData([{
-          // freeze: 'B3',
-          styles: [
-            {
-              bgcolor: '#f4f5f8',
-              textwrap: true,
-              color: '#900b09',
-              border: {
-                top: ['thin', '#0366d6'],
-                bottom: ['thin', '#0366d6'],
-                right: ['thin', '#0366d6'],
-                left: ['thin', '#0366d6'],
-              },
-            },
-          ],
-          merges: [
-            'C3:D4',
-          ],
-          charts: {
-            len: 1,
-            'aebabc6c-d9fd-64a6-3929-162c231b92fd': {
-              id: 'aebabc6c-d9fd-64a6-3929-162c231b92fd',
-              chartType: 'bar',
-              option: {
-                xAxis: {
-                  type: 'category',
-                  data: [
-                    'Mon',
-                    'Tue',
-                    'Wed',
-                    'Thu',
-                    'Fri',
-                    'Sat',
-                    'Sun',
-                  ],
-                },
-                yAxis: {
-                  type: 'value',
-                },
-                series: [
-                  {
-                    data: [
-                      120,
-                      200,
-                      150,
-                      80,
-                      70,
-                      110,
-                      130,
-                    ],
-                    type: 'bar',
-                    showBackground: true,
-                    backgroundStyle: {
-                      color: 'rgba(180, 180, 180, 0.2)',
-                    },
-                  },
-                ],
-              },
-              left: 100,
-              top: 225,
-              width: 400,
-              height: 300,
-              cellRange: {
-                sc: {
-                  ri: 8,
-                  ci: 0,
-                },
-                ec: {
-                  ri: 20,
-                  ci: 4,
-                },
-              },
-            },
-          },
-          images: {
-            len: 1,
-            '867bd92f-1fc5-1774-d27b-932efe8b821f': {
-              id: '867bd92f-1fc5-1774-d27b-932efe8b821f',
-              src: 'c2b8e4cfd6ec52f7a3715d23062cf061.jpg',
-              left: 500,
-              top: 175,
-              width: 367,
-              height: 192,
-              cellRange: {
-                sc: {
-                  ri: 6,
-                  ci: 3,
-                },
-                ec: {
-                  ri: 13,
-                  ci: 7,
-                },
-              },
-            },
-          },
-
-          cols: {
-            len: 10,
-            2: { width: 200 },
-          },
-          rows,
-        }, { name: 'sheet-test', rows: rows10 }]).change((cdata) => {
-          // console.log(cdata);
-          console.log('>>>', xs.getData());
-        });
+        // .loadData([{
+        //   // freeze: 'B3',
+        //   styles: [
+        //     {
+        //       bgcolor: '#f4f5f8',
+        //       textwrap: true,
+        //       color: '#900b09',
+        //       border: {
+        //         top: ['thin', '#0366d6'],
+        //         bottom: ['thin', '#0366d6'],
+        //         right: ['thin', '#0366d6'],
+        //         left: ['thin', '#0366d6'],
+        //       },
+        //     },
+        //   ],
+        //   merges: [
+        //     'C3:D4',
+        //   ],
+        //   charts: {
+        //     len: 1,
+        //     'aebabc6c-d9fd-64a6-3929-162c231b92fd': {
+        //       id: 'aebabc6c-d9fd-64a6-3929-162c231b92fd',
+        //       chartType: 'bar',
+        //       option: {
+        //         xAxis: {
+        //           type: 'category',
+        //           data: [
+        //             'Mon',
+        //             'Tue',
+        //             'Wed',
+        //             'Thu',
+        //             'Fri',
+        //             'Sat',
+        //             'Sun',
+        //           ],
+        //         },
+        //         yAxis: {
+        //           type: 'value',
+        //         },
+        //         series: [
+        //           {
+        //             data: [
+        //               120,
+        //               200,
+        //               150,
+        //               80,
+        //               70,
+        //               110,
+        //               130,
+        //             ],
+        //             type: 'bar',
+        //             showBackground: true,
+        //             backgroundStyle: {
+        //               color: 'rgba(180, 180, 180, 0.2)',
+        //             },
+        //           },
+        //         ],
+        //       },
+        //       left: 100,
+        //       top: 225,
+        //       width: 400,
+        //       height: 300,
+        //       cellRange: {
+        //         sc: {
+        //           ri: 8,
+        //           ci: 0,
+        //         },
+        //         ec: {
+        //           ri: 20,
+        //           ci: 4,
+        //         },
+        //       },
+        //     },
+        //   },
+        //   images: {
+        //     len: 1,
+        //     '867bd92f-1fc5-1774-d27b-932efe8b821f': {
+        //       id: '867bd92f-1fc5-1774-d27b-932efe8b821f',
+        //       src: 'c2b8e4cfd6ec52f7a3715d23062cf061.jpg',
+        //       left: 500,
+        //       top: 175,
+        //       width: 367,
+        //       height: 192,
+        //       cellRange: {
+        //         sc: {
+        //           ri: 6,
+        //           ci: 3,
+        //         },
+        //         ec: {
+        //           ri: 13,
+        //           ci: 7,
+        //         },
+        //       },
+        //     },
+        //   },
+        //
+        //   cols: {
+        //     len: 10,
+        //     2: { width: 200 },
+        //   },
+        //   rows,
+        // }, { name: 'sheet-test', rows: rows10 }]).change((cdata) => {
+        //   // console.log(cdata);
+        //   console.log('>>>', xs.getData());
+        // });
       //
 // console.log(3333333333,xs)
 //       xs.on('cell-selected', (cell, ri, ci) => {

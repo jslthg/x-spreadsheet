@@ -1,5 +1,6 @@
 /* global window */
 import * as echarts from 'echarts';
+import { fileOpen } from 'browser-fs-access';
 import { Element, h } from './element';
 import {
   bind,
@@ -610,6 +611,8 @@ function toolbarChange(type, value) {
     this.modalCharts.show();
   } else if (type === 'slash') {
     this.modalSlash.show();
+    const cell = data.getSelectedCell();
+    this.modalSlash.setValue(cell);
   } else if (type === 'print') {
     this.print.preview();
   } else if (type === 'paintformat') {
@@ -769,7 +772,13 @@ function sheetInitEvents() {
   };
 
   modalSlash.ok = (r) => {
-    console.log(r.input.val())
+    const { data, table } = this;
+    // console.log(r.input.val());
+    // const cell = data.getSelectedRect();
+    // console.log(2222222, cell);
+    data.setSelectedCellAttr('type', 'slash');
+    data.setSelectedCellText(r.input.val(), 'finished');
+    table.render();
   };
   /**
    * modal  click ok button
@@ -1067,6 +1076,72 @@ function renderImages() {
     }
   });
 }
+async function uploadImage() {
+  try {
+    const blob = await fileOpen({
+      description: 'Image files',
+      mimeTypes: ['image/jpg', 'image/png', 'image/gif', 'image/webp'],
+      extensions: ['.jpg', '.jpeg', '.png', '.gif', '.webp'],
+    });
+    // 将图片上传到指定的服务器。
+    const { data } = this;
+    const { settings } = data;
+    const { upload } = settings; // 扩展默认配置
+    const {
+      url, method, name, success,
+    } = upload;
+
+    const formData = new FormData();
+    formData.append(name, blob);
+
+    // const response = await fetch(url, {
+    //   method,
+    //   body: formData,
+    // });
+    // if (success && typeof success === 'function') {
+    //   success(response);
+    // }
+    // const json = await response.json();
+    // 具体结构要后台接口提供。
+    // const { code, message, data: imageUrl } = json;
+    // if (code !== 0) {
+    //   throw new Error(message);
+    // }
+    // const { thumbUrl: imageUrl } = json;
+    return blob;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function insertImages(image) {
+  // 将图片上传到指定的服务器。
+  const { data, table } = this;
+  const { left, top } = data.getSelectedRect();
+  const img = h('div', 'image')
+    .children(h('img', '').attr('src', image.src));
+  const dc = new DragContainer('', data, img, left, top, image.width, image.height);
+  this.overlayerCEl.child(dc.el);
+
+  const sc = data.getCellRectByXY(left, top);
+  const ec = data.getCellRectByXY(left + image.width, top + image.height);
+  const cellRange = { sc: { ri: sc.ri, ci: sc.ci }, ec: { ri: ec.ri, ci: ec.ci } };
+
+  data.images.insert(dc.getId(),
+    {
+      id: dc.getId(),
+      src: testimg,
+      left,
+      top,
+      width: image.width,
+      height: image.height,
+      cellRange,
+    });
+
+  sheetReset.call(this);
+  // 刷新显示
+  table.render();
+}
 export default class Sheet {
   constructor(targetEl, data) {
     this.eventMap = createEventEmitter();
@@ -1176,6 +1251,13 @@ export default class Sheet {
   }
 
   image() {
+    uploadImage.call(this).then((r) => {
+      console.log(323, r);
+      insertImages.call(this, { src: r.name, width: 100, height: 100 });
+    });
+  }
+
+  image1() {
     // 将图片上传到指定的服务器。
     const { data, table } = this;
     const { left, top } = data.getSelectedRect();

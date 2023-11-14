@@ -65,6 +65,7 @@
     "webpack-merge": "^4.1.4"
   },
   "dependencies": {
+    "browser-fs-access": "^0.35.0",
     "echarts": "^5.4.3",
     "opencollective": "^1.0.3",
     "opencollective-postinstall": "^2.0.2"

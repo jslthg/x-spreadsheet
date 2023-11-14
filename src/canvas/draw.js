@@ -401,17 +401,18 @@ class Draw {
    * @param {Object} fixedIndexHeight - 列坐标高度
    */
   image(box, { value: src }, { fixedIndexWidth, fixedIndexHeight }) {
+    const { ctx } = this;
     const img = new window.Image();
     img.src = src;
     img.onload = () => {
-      this.ctx.save();
+      ctx.save();
       const {
         x, y, width, height,
       } = box;
       const sx = x + fixedIndexWidth;
       const sy = y + fixedIndexHeight;
-      this.ctx.drawImage(img, npx(sx), npx(sy), npx(width), npx(height));
-      this.ctx.restore();
+      ctx.drawImage(img, npx(sx), npx(sy), npx(width), npx(height));
+      ctx.restore();
     };
 
     return this;

@@ -107,6 +107,18 @@ const defaultSettings = {
     },
     format: 'normal',
   },
+  // 配置上传
+  upload: {
+    url: '',
+    method: 'POST',
+    headers: {},
+    params: {},
+    name: 'file',
+    success: (res) => {
+      console.log(res);
+    },
+  },
+
 };
 
 const toolbarHeight = 41;

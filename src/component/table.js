@@ -88,21 +88,70 @@ export function renderCell(draw, data, rindex, cindex, yoffset = 0) {
     const font = Object.assign({}, style.font);
     font.size = getFontSizePxByPt(font.size);
     // console.log('style:', style);
-    draw.text(cellText, dbox, {
-      align: style.align,
-      valign: style.valign,
-      font,
-      color: style.color,
-      strike: style.strike,
-      underline: style.underline,
-    }, style.textwrap);
     if (Object.hasOwn(cell, 'type')) {
-      if (cell.type === 'image') {
-        const fixedIndexWidth = cols.indexWidth;
-        const fixedIndexHeight = rows.height;
-        draw.image(dbox, { value: cell.value }, { fixedIndexWidth, fixedIndexHeight });
+      // if (cell.type === 'image') {
+      //   const fixedIndexWidth = cols.indexWidth;
+      //   const fixedIndexHeight = rows.height;
+      //   draw.image(dbox, { value: cell.value }, { fixedIndexWidth, fixedIndexHeight });
+      // }
+      if (cell.type === 'slash') {
+        const ts = cellText.split('|');
+        const {
+          left, top, width, height,
+        } = data.cellRect(rindex, cindex);
+
+        if (ts.length === 2) {
+          draw.text(ts[0], dbox, {
+            align: 'left',
+            valign: 'middle',
+            font,
+            color: style.color,
+          }, style.textwrap);
+          draw.text(ts[1], dbox, {
+            align: 'right',
+            valign: 'middle',
+            font,
+            color: style.color,
+          }, style.textwrap);
+
+          draw.line([left - 5, top], [left + width + 5, top + height - 1]);
+        } else if (ts.length === 3) {
+          draw.text(ts[0], dbox, {
+            align: 'left',
+            valign: 'bottom',
+            font,
+            color: style.color,
+          }, style.textwrap);
+          draw.text(ts[1], dbox, {
+            align: 'center',
+            valign: 'middle',
+            font,
+            color: style.color,
+          }, style.textwrap);
+          draw.text(ts[2], dbox, {
+            align: 'right',
+            valign: 'top',
+            font,
+            color: style.color,
+          }, style.textwrap);
+          draw.line(
+            [left, (top + height) / 2],
+            [left + width + 5, top + height - 1],
+            [(left + width) / 2, top],
+          );
+        }
       }
+    } else {
+      draw.text(cellText, dbox, {
+        align: style.align,
+        valign: style.valign,
+        font,
+        color: style.color,
+        strike: style.strike,
+        underline: style.underline,
+      }, style.textwrap);
     }
+
     // error
     const error = data.validations.getError(rindex, cindex);
     if (error) {
