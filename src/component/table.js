@@ -366,6 +366,30 @@ function renderFreezeHighlightLine(fw, fh, ftw, fth) {
   draw.restore();
 }
 
+/** 1毫米大约是3.77像素
+ * width 718+(10+10)*3.77  px
+ * height 1047+(10+10)*3.77  px
+ * 页面打印区域* */
+function renderPrintArea(x, y) {
+  const { draw, data } = this;
+  const { rows, cols } = data;
+  const paperHeight = rows.len * rows.height;
+  const paperWidth = cols.len * cols.width;
+  draw.save();
+  draw.border('dashed', '#8D8E8E');
+  const sW = 718 + (10 + 10) * 3.77;
+  const c1 = Math.floor(paperWidth / sW);
+  for (let i = 1; i <= c1; i += 1) {
+    draw.line([sW * i + x, 0], [sW * i + x, paperHeight]);
+  }
+
+  const sH = 1047 + (10 + 10) * 3.77;
+  const c2 = Math.floor(paperHeight / sH);
+  for (let i = 1; i <= c2; i += 1) {
+    draw.line([0, sH * i + y], [paperHeight, sH * i + y]);
+  }
+  draw.restore();
+}
 /** end */
 class Table {
   constructor(el, data) {
@@ -431,6 +455,7 @@ class Table {
       // 5
       renderFreezeHighlightLine.call(this, fw, fh, tx, ty);
     }
+    renderPrintArea.call(this, -x, -y);
   }
 
   clear() {

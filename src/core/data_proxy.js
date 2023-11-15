@@ -118,7 +118,17 @@ const defaultSettings = {
       console.log(res);
     },
   },
-
+  print: {
+    layout: 'portrait',
+    printCallBackUrl: '',
+    paper: 'A4',
+    isBackend: false,
+    width: 210,
+    definition: 1,
+    marginX: 10,
+    height: 297,
+    marginY: 10,
+  },
 };
 
 const toolbarHeight = 41;

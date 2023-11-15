@@ -279,7 +279,7 @@ class Draw {
     } else if (style === 'thick') {
       ctx.lineWidth = npx(3);
     } else if (style === 'dashed') {
-      ctx.setLineDash([npx(3), npx(2)]);
+      ctx.setLineDash([npx(3), npx(3)]);
     } else if (style === 'dotted') {
       ctx.setLineDash([npx(1), npx(1)]);
     } else if (style === 'double') {
