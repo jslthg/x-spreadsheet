@@ -99,6 +99,7 @@
       previewEl.height = 16
 
       var xs = x_spreadsheet('#x-spreadsheet-demo', {
+        mode:'view',
         showToolbar: true,
         showGrid: true,
         showBottomBar: false,
@@ -123,111 +124,10 @@
           // ],
         }
       })
-        // .loadData([{
-        //   // freeze: 'B3',
-        //   styles: [
-        //     {
-        //       bgcolor: '#f4f5f8',
-        //       textwrap: true,
-        //       color: '#900b09',
-        //       border: {
-        //         top: ['thin', '#0366d6'],
-        //         bottom: ['thin', '#0366d6'],
-        //         right: ['thin', '#0366d6'],
-        //         left: ['thin', '#0366d6'],
-        //       },
-        //     },
-        //   ],
-        //   merges: [
-        //     'C3:D4',
-        //   ],
-        //   charts: {
-        //     len: 1,
-        //     'aebabc6c-d9fd-64a6-3929-162c231b92fd': {
-        //       id: 'aebabc6c-d9fd-64a6-3929-162c231b92fd',
-        //       chartType: 'bar',
-        //       option: {
-        //         xAxis: {
-        //           type: 'category',
-        //           data: [
-        //             'Mon',
-        //             'Tue',
-        //             'Wed',
-        //             'Thu',
-        //             'Fri',
-        //             'Sat',
-        //             'Sun',
-        //           ],
-        //         },
-        //         yAxis: {
-        //           type: 'value',
-        //         },
-        //         series: [
-        //           {
-        //             data: [
-        //               120,
-        //               200,
-        //               150,
-        //               80,
-        //               70,
-        //               110,
-        //               130,
-        //             ],
-        //             type: 'bar',
-        //             showBackground: true,
-        //             backgroundStyle: {
-        //               color: 'rgba(180, 180, 180, 0.2)',
-        //             },
-        //           },
-        //         ],
-        //       },
-        //       left: 100,
-        //       top: 225,
-        //       width: 400,
-        //       height: 300,
-        //       cellRange: {
-        //         sc: {
-        //           ri: 8,
-        //           ci: 0,
-        //         },
-        //         ec: {
-        //           ri: 20,
-        //           ci: 4,
-        //         },
-        //       },
-        //     },
-        //   },
-        //   images: {
-        //     len: 1,
-        //     '867bd92f-1fc5-1774-d27b-932efe8b821f': {
-        //       id: '867bd92f-1fc5-1774-d27b-932efe8b821f',
-        //       src: 'c2b8e4cfd6ec52f7a3715d23062cf061.jpg',
-        //       left: 500,
-        //       top: 175,
-        //       width: 367,
-        //       height: 192,
-        //       cellRange: {
-        //         sc: {
-        //           ri: 6,
-        //           ci: 3,
-        //         },
-        //         ec: {
-        //           ri: 13,
-        //           ci: 7,
-        //         },
-        //       },
-        //     },
-        //   },
-        //
-        //   cols: {
-        //     len: 10,
-        //     2: { width: 200 },
-        //   },
-        //   rows,
-        // }, { name: 'sheet-test', rows: rows10 }]).change((cdata) => {
-        //   // console.log(cdata);
-        //   console.log('>>>', xs.getData());
-        // });
+        .loadData([{"name":"sheet1","freeze":"A1","styles":[{"font":{"name":"隶书"}},{"font":{"name":"隶书","size":16}},{"font":{"name":"隶书","size":16},"textwrap":true}],"images":{"len":1,"6c0c9489-1699-1603-b291-578a1c84ef12":{"id":"6c0c9489-1699-1603-b291-578a1c84ef12","src":"http://127.0.0.3/photo/image/1699052782250.jpg","left":100,"top":200,"width":367,"height":192,"cellRange":{"sc":{"ri":7,"ci":0},"ec":{"ri":14,"ci":4}}}},"charts":{"len":0},"merges":["B5:G5","B6:G6"],"rows":{"4":{"cells":{"1":{"text":"d法国电视了；科技手段拉开放假了凯撒地方离开家拉萨的弗兰克骄傲了史蒂夫","merge":[0,5]}}},"5":{"cells":{"1":{"merge":[0,5],"text":"绿卡技术的离开房间洒到了记录卡上的法律框架卢卡斯地方了看见啦SD卡","style":2},"2":{"style":2},"3":{"style":2},"4":{"style":2},"5":{"style":2},"6":{"style":2}},"height":47},"len":100},"cols":{"len":26},"validations":[],"autofilter":{}}]).change((cdata) => {
+          // console.log(cdata);
+          console.log('>>>', xs.getData());
+        });
       //
 // console.log(3333333333,xs)
 //       xs.on('cell-selected', (cell, ri, ci) => {
@@ -238,7 +138,9 @@
 //           console.log('>>>> data is  pasted-clipboard ', data);
 //         }).on('saved', function(){
 //         console.log('click save button：')
-//       });
+//       }).on('toolbar-change', function(t,v){
+//       console.log('click save button：',t,v)
+//     });
       //
       // setTimeout(() => {
       //   // xs.loadData([{ rows }]);

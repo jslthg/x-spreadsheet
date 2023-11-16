@@ -1,6 +1,5 @@
 /* global window */
 import * as echarts from 'echarts';
-import { fileOpen } from 'browser-fs-access';
 import { Element, h } from './element';
 import {
   bind,
@@ -23,8 +22,9 @@ import { cssPrefix } from '../config';
 import { formulas } from '../core/formula';
 import ModalCharts from './modal_charts';
 import DragContainer from './drag_container';
-import testimg from '../../assets/1.jpg';
 import ModalSlash from './modal_slash';
+import helper from '../core/helper';
+
 /**
  * @desc throttle fn
  * @param func function
@@ -209,8 +209,8 @@ function overlayerMousescroll(evt) {
     } while (v <= 0);
     return v;
   };
-  // console.log('deltaX', deltaX, 'evt.detail', evt.detail);
-  // if (evt.detail) deltaY = evt.detail * 40;
+    // console.log('deltaX', deltaX, 'evt.detail', evt.detail);
+    // if (evt.detail) deltaY = evt.detail * 40;
   const moveY = (vertical) => {
     if (vertical > 0) {
       // up
@@ -272,17 +272,29 @@ function overlayerTouch(direction, distance) {
 
 function verticalScrollbarSet() {
   const { data, verticalScrollbar } = this;
-  const { height } = this.getTableOffset();
-  const erth = data.exceptRowTotalHeight(0, -1);
-  // console.log('erth:', erth);
-  verticalScrollbar.set(height, data.rows.totalHeight() - erth);
+  // 预览模式
+  if (data.settings.mode === 'view') {
+    const { height } = this.getRect();
+    const erth = data.exceptRowTotalHeight(0, -1);
+    verticalScrollbar.set(height, data.rows.totalHeight() - erth);
+  } else {
+    const { height } = this.getTableOffset();
+    const erth = data.exceptRowTotalHeight(0, -1);
+    // console.log('erth:', erth);
+    verticalScrollbar.set(height, data.rows.totalHeight() - erth);
+  }
 }
 
 function horizontalScrollbarSet() {
   const { data, horizontalScrollbar } = this;
-  const { width } = this.getTableOffset();
   if (data) {
-    horizontalScrollbar.set(width, data.cols.totalWidth());
+    if (data.settings.mode === 'view') {
+      const { width } = this.getRect();
+      horizontalScrollbar.set(width, data.cols.totalWidth());
+    } else {
+      const { width } = this.getTableOffset();
+      horizontalScrollbar.set(width, data.cols.totalWidth());
+    }
   }
 }
 
@@ -471,6 +483,7 @@ function editorSet() {
   editor.setCell(data.getSelectedCell(), data.getSelectedValidator());
   clearClipboard.call(this);
 }
+
 function dragContainerSetOffset() {
   const { data, overlayerCEl } = this;
 
@@ -492,6 +505,7 @@ function dragContainerSetOffset() {
     }
   });
 }
+
 function verticalScrollbarMove(distance) {
   const { data, table, selector } = this;
   data.scrolly(distance, () => {
@@ -606,9 +620,23 @@ function toolbarChange(type, value) {
   } else if (type === 'qrcode') {
     console.log('toolbarChange.qrcode');
   } else if (type === 'image') {
-    this.image();
+    // 改由外部事件响应出写入
+    const that = this;
+    helper.uploadImage(this.data.settings.upload).then((r) => {
+      if (r && r.code === 1) {
+        r.data.forEach((src) => {
+          const img = new Image();
+          img.src = src;
+          img.onload = () => {
+            that.insertImage({ src, width: img.width, height: img.height });
+          };
+        });
+      }
+    });
+    // this.insertImage({ src: testimg, width: 150, height: 100 });
   } else if (type === 'chart') {
-    this.modalCharts.show();
+    // 改由外部事件响应出写入
+    // this.modalCharts.show();
   } else if (type === 'slash') {
     this.modalSlash.show();
     const cell = data.getSelectedCell();
@@ -649,6 +677,112 @@ function sortFilterChange(ci, order, operator, value) {
   sheetReset.call(this);
 }
 
+function renderCharts() {
+  const { data, table } = this;
+  const { charts } = data;
+  Object.keys(charts.getData()).forEach((key) => {
+    if (key !== 'len') {
+      const temp = charts.getData()[key];
+      const chart = h('div', 'chart');
+      const dc = new DragContainer(temp.id, data, chart, temp.left, temp.top, temp.width, temp.height, 'chart');
+      this.overlayerCEl.child(dc.el);
+      const myChart = echarts.init(chart.el);
+      myChart.setOption(temp.option);
+
+      sheetReset.call(this);
+      // 刷新显示
+      table.render();
+    }
+  });
+}
+
+function renderImages() {
+  const { data, table } = this;
+  const { images } = data;
+  Object.keys(images.getData()).forEach((key) => {
+    if (key !== 'len') {
+      const temp = images.getData()[key];
+      const img = h('div', 'image')
+        .children(h('img', '').attr('src', temp.src));
+      const dc = new DragContainer(temp.id,
+        data, img, temp.left, temp.top, temp.width, temp.height);
+
+      this.overlayerCEl.child(dc.el);
+      sheetReset.call(this);
+      // 刷新显示
+      table.render();
+    }
+  });
+}
+
+
+function insertCharts(type = 'bar', chartOption = {}) {
+  const { data, table } = this;
+  const { left, top } = data.getSelectedRect();
+  const chart = h('div', 'chart');
+  const dc = new DragContainer('', data, chart, left, top, 400, 300, 'chart');
+  this.overlayerCEl.child(dc.el);
+
+  const myChart = echarts.init(chart.el);
+  const option = {};
+  Object.assign(option, chartOption);
+  myChart.setOption(option);
+
+  const sc = data.getCellRectByXY(left, top);
+  const ec = data.getCellRectByXY(left + 400, top + 300);
+  const cellRange = { sc: { ri: sc.ri, ci: sc.ci }, ec: { ri: ec.ri, ci: ec.ci } };
+
+  data.charts.insert(dc.getId(),
+    {
+      id: dc.getId(),
+      chartType: type,
+      option,
+      left,
+      top,
+      width: 400,
+      height: 300,
+      cellRange,
+    });
+
+  dc.resize = () => {
+    myChart.resize();
+  };
+
+
+  sheetReset.call(this);
+  // 刷新显示
+  table.render();
+}
+
+function insertImages(image) {
+  // 将图片上传到指定的服务器。
+  const { data, table } = this;
+  const { left, top } = data.getSelectedRect();
+  const img = h('div', 'image')
+    .children(h('img', '').attr('src', image.src));
+  const dc = new DragContainer('', data, img, left, top, image.width, image.height);
+  this.overlayerCEl.child(dc.el);
+
+  const sc = data.getCellRectByXY(left, top);
+  const ec = data.getCellRectByXY(left + image.width, top + image.height);
+  const cellRange = { sc: { ri: sc.ri, ci: sc.ci }, ec: { ri: ec.ri, ci: ec.ci } };
+
+  data.images.insert(dc.getId(),
+    {
+      id: dc.getId(),
+      src: image.src,
+      left,
+      top,
+      width: image.width,
+      height: image.height,
+      cellRange,
+    });
+
+  sheetReset.call(this);
+  // 刷新显示
+  table.render();
+}
+
 function sheetInitEvents() {
   const {
     selector,
@@ -665,7 +799,7 @@ function sheetInitEvents() {
     modalCharts,
     modalSlash,
   } = this;
-  // overlayer
+    // overlayer
   overlayerEl
     .on('mousemove', (evt) => {
       overlayerMousemove.call(this, evt);
@@ -711,7 +845,10 @@ function sheetInitEvents() {
   });
 
   // toolbar change
-  toolbar.change = (type, value) => toolbarChange.call(this, type, value);
+  toolbar.change = (type, value) => {
+    toolbarChange.call(this, type, value);
+    this.trigger('toolbar-change', type, value);
+  };
 
   // sort filter ok
   sortFilter.ok = (ci, order, o, v) => sortFilterChange.call(this, ci, order, o, v);
@@ -773,26 +910,16 @@ function sheetInitEvents() {
 
   modalSlash.ok = (r) => {
     const { data, table } = this;
-    // console.log(r.input.val());
-    // const cell = data.getSelectedRect();
-    // console.log(2222222, cell);
     data.setSelectedCellAttr('type', 'slash');
     data.setSelectedCellText(r.input.val(), 'finished');
     table.render();
   };
   /**
-   * modal  click ok button
-   * @param t
-   */
+     * modal  click ok button
+     * @param t
+     */
   modalCharts.ok = () => {
-    const { data, table } = this;
-    const { left, top } = data.getSelectedRect();
-    const chart = h('div', 'chart');
-    const dc = new DragContainer('', data, chart, left, top, 400, 300, 'chart');
-    this.overlayerCEl.child(dc.el);
-
-    const myChart = echarts.init(chart.el);
-    const option = {
+    insertCharts.call(this, 'bar', {
       xAxis: {
         type: 'category',
         data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
@@ -810,34 +937,7 @@ function sheetInitEvents() {
           },
         },
       ],
-    };
-
-    myChart.setOption(option);
-
-    const sc = data.getCellRectByXY(left, top);
-    const ec = data.getCellRectByXY(left + 400, top + 300);
-    const cellRange = { sc: { ri: sc.ri, ci: sc.ci }, ec: { ri: ec.ri, ci: ec.ci } };
-
-    data.charts.insert(dc.getId(),
-      {
-        id: dc.getId(),
-        chartType: 'bar',
-        option,
-        left,
-        top,
-        width: 400,
-        height: 300,
-        cellRange,
-      });
-
-    dc.resize = () => {
-      myChart.resize();
-    };
-
-
-    sheetReset.call(this);
-    // 刷新显示
-    table.render();
+    });
   };
 
   bind(window, 'resize', () => {
@@ -862,15 +962,15 @@ function sheetInitEvents() {
 
 
   /**
-   * 绑定拖拽事件
-   */
+     * 绑定拖拽事件
+     */
   bind(window, 'dragover', (evt) => {
     evt.preventDefault();
     evt.dataTransfer.dropEffect = 'move';
   });
   /**
-   * 绑定拖拽事件
-   */
+     * 绑定拖拽事件
+     */
   bind(window, 'drop', (evt) => {
     evt.preventDefault();
     // 获取自定义节点信息
@@ -1026,9 +1126,9 @@ function sheetInitEvents() {
         insertDeleteRowColumn.call(this, 'delete-cell-text');
         evt.preventDefault();
       } else if ((keyCode >= 65 && keyCode <= 90)
-        || (keyCode >= 48 && keyCode <= 57)
-        || (keyCode >= 96 && keyCode <= 105)
-        || evt.key === '='
+                || (keyCode >= 48 && keyCode <= 57)
+                || (keyCode >= 96 && keyCode <= 105)
+                || evt.key === '='
       ) {
         dataSetCellText.call(this, evt.key, 'input');
         editorSet.call(this);
@@ -1040,114 +1140,15 @@ function sheetInitEvents() {
   });
 }
 
-function renderCharts() {
-  const { data, table } = this;
-  const { charts } = data;
-  Object.keys(charts.getData()).forEach((key) => {
-    if (key !== 'len') {
-      const temp = charts.getData()[key];
-      const chart = h('div', 'chart');
-      const dc = new DragContainer(temp.id, data, chart, temp.left, temp.top, temp.width, temp.height, 'chart');
-      this.overlayerCEl.child(dc.el);
-      const myChart = echarts.init(chart.el);
-      myChart.setOption(temp.option);
-
-      sheetReset.call(this);
-      // 刷新显示
-      table.render();
-    }
-  });
-}
-function renderImages() {
-  const { data, table } = this;
-  const { images } = data;
-  Object.keys(images.getData()).forEach((key) => {
-    if (key !== 'len') {
-      const temp = images.getData()[key];
-      const img = h('div', 'image')
-        .children(h('img', '').attr('src', temp.src));
-      const dc = new DragContainer(temp.id,
-        data, img, temp.left, temp.top, temp.width, temp.height);
-
-      this.overlayerCEl.child(dc.el);
-      sheetReset.call(this);
-      // 刷新显示
-      table.render();
-    }
-  });
-}
-async function uploadImage() {
-  try {
-    const blob = await fileOpen({
-      description: 'Image files',
-      mimeTypes: ['image/jpg', 'image/png', 'image/gif', 'image/webp'],
-      extensions: ['.jpg', '.jpeg', '.png', '.gif', '.webp'],
-    });
-    // 将图片上传到指定的服务器。
-    const { data } = this;
-    const { settings } = data;
-    const { upload } = settings; // 扩展默认配置
-    const {
-      url, method, name, success,
-    } = upload;
-
-    const formData = new FormData();
-    formData.append(name, blob);
-
-    // const response = await fetch(url, {
-    //   method,
-    //   body: formData,
-    // });
-    // if (success && typeof success === 'function') {
-    //   success(response);
-    // }
-    // const json = await response.json();
-    // 具体结构要后台接口提供。
-    // const { code, message, data: imageUrl } = json;
-    // if (code !== 0) {
-    //   throw new Error(message);
-    // }
-    // const { thumbUrl: imageUrl } = json;
-    return blob;
-  } catch (e) {
-    console.error(e);
-  }
-}
-
-function insertImages(image) {
-  // 将图片上传到指定的服务器。
-  const { data, table } = this;
-  const { left, top } = data.getSelectedRect();
-  const img = h('div', 'image')
-    .children(h('img', '').attr('src', image.src));
-  const dc = new DragContainer('', data, img, left, top, image.width, image.height);
-  this.overlayerCEl.child(dc.el);
-
-  const sc = data.getCellRectByXY(left, top);
-  const ec = data.getCellRectByXY(left + image.width, top + image.height);
-  const cellRange = { sc: { ri: sc.ri, ci: sc.ci }, ec: { ri: ec.ri, ci: ec.ci } };
-
-  data.images.insert(dc.getId(),
-    {
-      id: dc.getId(),
-      src: testimg,
-      left,
-      top,
-      width: image.width,
-      height: image.height,
-      cellRange,
-    });
-
-  sheetReset.call(this);
-  // 刷新显示
-  table.render();
-}
 export default class Sheet {
   constructor(targetEl, data) {
     this.eventMap = createEventEmitter();
-    const { view, showToolbar, showContextmenu } = data.settings;
+    const {
+      view, showToolbar, showContextmenu, mode,
+    } = data.settings;
+    console.log('sheet-settings.mode', mode);
     this.el = h('div', `${cssPrefix}-sheet`);
-    this.toolbar = new Toolbar(data, view.width, !showToolbar);
+    this.toolbar = new Toolbar(data, view.width, !showToolbar || mode === 'view');
     this.print = new Print(data);
     targetEl.children(this.toolbar.el, this.el, this.print.el);
     this.data = data;
@@ -1171,14 +1172,17 @@ export default class Sheet {
     this.modalCharts = new ModalCharts();
     this.modalSlash = new ModalSlash();
     // contextMenu
-    this.contextMenu = new ContextMenu(() => this.getRect(), !showContextmenu);
+    this.contextMenu = new ContextMenu(() => this.getRect(), !showContextmenu || mode === 'view');
     // selector
     this.selector = new Selector(data);
     this.overlayerCEl = h('div', `${cssPrefix}-overlayer-content`)
       .children(
         this.editor.el,
-        this.selector.el,
+        // this.selector.el,
       );
+    if (mode !== 'view') {
+      this.overlayerCEl.child(this.selector.el);
+    }
     this.overlayerEl = h('div', `${cssPrefix}-overlayer`)
       .child(this.overlayerCEl);
     // sortFilter
@@ -1233,6 +1237,10 @@ export default class Sheet {
 
   loadData(data) {
     this.data.setData(data);
+
+    renderImages.call(this);
+    renderCharts.call(this);
+
     sheetReset.call(this);
     return this;
   }
@@ -1250,44 +1258,12 @@ export default class Sheet {
     sheetReset.call(this);
   }
 
-  image() {
-    uploadImage.call(this).then((r) => {
-      console.log(323, r);
-      insertImages.call(this, { src: r.name, width: 100, height: 100 });
-    });
+  insertImage(image = {}) {
+    insertImages.call(this, image);
   }
 
-  image1() {
-    // 将图片上传到指定的服务器。
-    const { data, table } = this;
-    const { left, top } = data.getSelectedRect();
-    const image = new window.Image();
-    image.src = testimg;
-    image.onload = () => {
-      const img = h('div', 'image')
-        .children(h('img', '').attr('src', testimg));
-      const dc = new DragContainer('', data, img, left, top, image.width, image.height);
-      this.overlayerCEl.child(dc.el);
-
-      const sc = data.getCellRectByXY(left, top);
-      const ec = data.getCellRectByXY(left + image.width, top + image.height);
-      const cellRange = { sc: { ri: sc.ri, ci: sc.ci }, ec: { ri: ec.ri, ci: ec.ci } };
-
-      data.images.insert(dc.getId(),
-        {
-          id: dc.getId(),
-          src: testimg,
-          left,
-          top,
-          width: image.width,
-          height: image.height,
-          cellRange,
-        });
-
-      sheetReset.call(this);
-      // 刷新显示
-      table.render();
-    };
+  insertChart(type, chartOption) {
+    insertCharts.call(this, type, chartOption);
   }
 
   undo() {

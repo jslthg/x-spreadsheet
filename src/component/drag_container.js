@@ -114,38 +114,46 @@ export default class DragContainer extends Element {
     this.attr('id', id);
     domEl.attr('id', `${id}_cm`);
     this.dp = dp;
-    this.contextMenu = new DragMenu();
-    this.children(
-      h('div', `drag-content`).children(domEl)
-        .on('mousedown', e => this.onMousedown(e)),
-      h('div', `drag-circle`).children(
-        h('div', `cc top-left`).on('mousedown', e => this.onResize(e, 'tl')),
-        h('div', `cc top-center`).on('mousedown', e => this.onResize(e, 'tc')),
-        h('div', `cc top-right`).on('mousedown', e => this.onResize(e, 'tr')),
-        h('div', `cc middle-left`).on('mousedown', e => this.onResize(e, 'ml')),
-        h('div', `cc middle-right`).on('mousedown', e => this.onResize(e, 'mr')),
-        h('div', `cc bottom-left`).on('mousedown', e => this.onResize(e, 'bl')),
-        h('div', `cc bottom-center`).on('mousedown', e => this.onResize(e, 'bc')),
-        h('div', `cc bottom-right`).on('mousedown', e => this.onResize(e, 'br')),
-      ),
-      h('div', `${cssPrefix}-drag-mover`),
-      this.contextMenu.el,
-    );
+    // 编辑模式
+    if (dp.settings.mode === 'edit') {
+      this.contextMenu = new DragMenu();
+      this.children(
+        h('div', `drag-content`).children(domEl)
+          .on('mousedown', e => this.onMousedown(e)),
+        h('div', `drag-circle`).children(
+          h('div', `cc top-left`).on('mousedown', e => this.onResize(e, 'tl')),
+          h('div', `cc top-center`).on('mousedown', e => this.onResize(e, 'tc')),
+          h('div', `cc top-right`).on('mousedown', e => this.onResize(e, 'tr')),
+          h('div', `cc middle-left`).on('mousedown', e => this.onResize(e, 'ml')),
+          h('div', `cc middle-right`).on('mousedown', e => this.onResize(e, 'mr')),
+          h('div', `cc bottom-left`).on('mousedown', e => this.onResize(e, 'bl')),
+          h('div', `cc bottom-center`).on('mousedown', e => this.onResize(e, 'bc')),
+          h('div', `cc bottom-right`).on('mousedown', e => this.onResize(e, 'br')),
+        ),
+        h('div', `${cssPrefix}-drag-mover`),
+        this.contextMenu.el,
+      );
 
+      this.offset({
+        left, top, height, width,
+      });
+      this.on('click', () => { this.selected(); });
+      // 默认选择当前
+      setTimeout(() => {
+        this.selected();
+      }, 100);
 
-    this.offset({
-      left, top, height, width,
-    });
-    this.on('click', () => { this.selected(); });
-    // 默认选择当前
-    setTimeout(() => {
-      this.selected();
-    }, 100);
-
-    this.contextMenu.itemClick = (t) => {
-      this.menuClick(t);
-    };
-
+      this.contextMenu.itemClick = (t) => {
+        this.menuClick(t);
+      };
+    } else {
+      this.children(
+        h('div', `drag-content`).children(domEl),
+      );
+      this.offset({
+        left, top, height, width,
+      });
+    }
     this.resize = () => {};
     this.move = () => {};
   }

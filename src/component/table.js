@@ -243,17 +243,12 @@ function renderSelectedHeaderCell(x, y, w, h) {
 // ty: moving distance on y-axis
 function renderFixedHeaders(type, viewRange, w, h, tx, ty) {
   const { draw, data } = this;
-  const { settings } = data;
   const sumHeight = viewRange.h; // rows.sumHeight(viewRange.sri, viewRange.eri + 1);
   const sumWidth = viewRange.w; // cols.sumWidth(viewRange.sci, viewRange.eci + 1);
   const nty = ty + h;
   const ntx = tx + w;
 
   draw.save();
-  if (!settings.showFixedHeaders) {
-    draw.restore();
-    return;
-  }
   // draw rect background
   draw.attr(tableFixedHeaderCleanStyle);
   if (type === 'all' || type === 'left') draw.fillRect(0, nty, w, sumHeight);
@@ -310,14 +305,9 @@ function renderFixedHeaders(type, viewRange, w, h, tx, ty) {
 }
 
 function renderFixedLeftTopCell(fw, fh) {
-  const { draw, data } = this;
-  const { settings } = data;
+  const { draw } = this;
   draw.save();
 
-  if (!settings.showFixedHeaders) {
-    draw.restore();
-    return;
-  }
   // left-top-cell
   draw.attr({ fillStyle: '#f4f5f8' })
     .fillRect(0, 0, fw, fh);
@@ -372,7 +362,11 @@ function renderFreezeHighlightLine(fw, fh, ftw, fth) {
  * 页面打印区域* */
 function renderPrintArea(x, y) {
   const { draw, data } = this;
-  const { rows, cols } = data;
+  const { rows, cols, settings } = data;
+
+  if (settings.mode === 'view') {
+    return;
+  }
   const paperHeight = rows.len * rows.height;
   const paperWidth = cols.len * cols.width;
   draw.save();
@@ -406,7 +400,7 @@ class Table {
   render() {
     // resize canvas
     const { data } = this;
-    const { rows, cols } = data;
+    const { rows, cols, settings } = data;
     // fixed width of header
     const fw = cols.indexWidth;
     // fixed height of header
@@ -421,10 +415,12 @@ class Table {
     const ty = data.freezeTotalHeight();
     const { x, y } = data.scroll;
     // 1
-    renderContentGrid.call(this, viewRange, fw, fh, tx, ty);
+    if (settings.mode !== 'view') {
+      renderContentGrid.call(this, viewRange, fw, fh, tx, ty);
+      renderFixedHeaders.call(this, 'all', viewRange, fw, fh, tx, ty);
+      renderFixedLeftTopCell.call(this, fw, fh);
+    }
     renderContent.call(this, viewRange, fw, fh, -x, -y);
-    renderFixedHeaders.call(this, 'all', viewRange, fw, fh, tx, ty);
-    renderFixedLeftTopCell.call(this, fw, fh);
     const [fri, fci] = data.freeze;
     if (fri > 0 || fci > 0) {
       // 2
@@ -433,9 +429,11 @@ class Table {
         vr.sri = 0;
         vr.eri = fri - 1;
         vr.h = ty;
-        renderContentGrid.call(this, vr, fw, fh, tx, 0);
+        if (settings.mode !== 'view') {
+          renderContentGrid.call(this, vr, fw, fh, tx, 0);
+          renderFixedHeaders.call(this, 'top', vr, fw, fh, tx, 0);
+        }
         renderContent.call(this, vr, fw, fh, -x, 0);
-        renderFixedHeaders.call(this, 'top', vr, fw, fh, tx, 0);
       }
       // 3
       if (fci > 0) {
@@ -443,19 +441,28 @@ class Table {
         vr.sci = 0;
         vr.eci = fci - 1;
         vr.w = tx;
-        renderContentGrid.call(this, vr, fw, fh, 0, ty);
-        renderFixedHeaders.call(this, 'left', vr, fw, fh, 0, ty);
+        if (settings.mode !== 'view') {
+          renderContentGrid.call(this, vr, fw, fh, 0, ty);
+          renderFixedHeaders.call(this, 'left', vr, fw, fh, 0, ty);
+        }
         renderContent.call(this, vr, fw, fh, 0, -y);
       }
       // 4
       const freezeViewRange = data.freezeViewRange();
-      renderContentGrid.call(this, freezeViewRange, fw, fh, 0, 0);
-      renderFixedHeaders.call(this, 'all', freezeViewRange, fw, fh, 0, 0);
+      if (settings.mode !== 'view') {
+        renderContentGrid.call(this, freezeViewRange, fw, fh, 0, 0);
+        renderFixedHeaders.call(this, 'all', freezeViewRange, fw, fh, 0, 0);
+      }
       renderContent.call(this, freezeViewRange, fw, fh, 0, 0);
       // 5
-      renderFreezeHighlightLine.call(this, fw, fh, tx, ty);
+      if (settings.mode !== 'view') {
+        renderFreezeHighlightLine.call(this, fw, fh, tx, ty);
+      }
     }
-    renderPrintArea.call(this, -x, -y);
+
+    if (settings.mode !== 'view') {
+      renderPrintArea.call(this, -x, -y);
+    }
   }
 
   clear() {

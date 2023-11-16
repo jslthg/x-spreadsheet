@@ -1,4 +1,6 @@
 /* eslint-disable no-param-reassign */
+import { fileOpen, supported } from 'browser-fs-access';
+
 function cloneDeep(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
@@ -116,6 +118,38 @@ function guid() {
   return `${S4() + S4()}-${S4()}-${S4()}-${S4()}-${S4()}${S4()}${S4()}`;
 }
 
+async function uploadImage(uploadConfig) {
+  try {
+    if (!supported) {
+      throw new Error('您的浏览器不支持browser-fs-access.');
+    }
+    const blob = await fileOpen({
+      description: 'Image files',
+      mimeTypes: ['image/jpg', 'image/png', 'image/gif', 'image/webp'],
+      extensions: ['.jpg', '.jpeg', '.png', '.gif', '.webp'],
+    });
+    // 将图片上传到指定的服务器。
+    const {
+      url, method, name, success,
+    } = uploadConfig;
+
+    const formData = new FormData();
+    formData.append(name, blob);
+
+    const response = await fetch(url, {
+      method,
+      body: formData,
+    });
+    if (success && typeof success === 'function') {
+      success(response);
+    }
+    const json = await response.json();
+    return json;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 export function numberCalc(type, a1, a2) {
   if (Number.isNaN(a1) || Number.isNaN(a2)) {
     return a1 + type + a2;
@@ -151,4 +185,5 @@ export default {
   deleteProperty,
   numberCalc,
   guid,
+  uploadImage,
 };

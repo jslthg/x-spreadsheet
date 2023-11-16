@@ -80,7 +80,6 @@ const defaultSettings = {
   showToolbar: true,
   showContextmenu: true,
   showBottomBar: true,
-  showFixedHeaders: true,
   row: {
     len: 100,
     height: 25,
@@ -109,11 +108,11 @@ const defaultSettings = {
   },
   // 配置上传
   upload: {
-    url: '',
+    url: 'http://localhost:9080/common/upload',
     method: 'POST',
     headers: {},
     params: {},
-    name: 'file',
+    name: 'files',
     success: (res) => {
       console.log(res);
     },

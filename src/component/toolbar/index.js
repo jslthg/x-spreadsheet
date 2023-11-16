@@ -118,12 +118,12 @@ export default class Toolbar {
     this.isHide = isHide;
     const style = data.defaultStyle();
     this.items = [
-      // [
-      //   this.viewEl = new View(),
-      // ],
-      // buildDivider(),
       [
+        this.viewEl = new View(),
         this.saveEl = new Save(),
+      ],
+      buildDivider(),
+      [
         this.undoEl = new Undo(),
         this.redoEl = new Redo(),
         // new Print(),
@@ -175,7 +175,7 @@ export default class Toolbar {
         this.imageEl = new Image(),
         // this.qrcodeEl = new Qrcode(),
         this.setupEl = new Setup(),
-        this.printEl = new Print(),
+        // this.printEl = new Print(),
       ],
     ];
 
