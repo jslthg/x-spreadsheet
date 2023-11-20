@@ -99,7 +99,7 @@
       previewEl.height = 16
 
       var xs = x_spreadsheet('#x-spreadsheet-demo', {
-        mode:'view',
+        // mode:'view',
         showToolbar: true,
         showGrid: true,
         showBottomBar: false,
@@ -124,10 +124,10 @@
           // ],
         }
       })
-        .loadData([{"name":"sheet1","freeze":"A1","styles":[{"font":{"name":"隶书"}},{"font":{"name":"隶书","size":16}},{"font":{"name":"隶书","size":16},"textwrap":true}],"images":{"len":1,"6c0c9489-1699-1603-b291-578a1c84ef12":{"id":"6c0c9489-1699-1603-b291-578a1c84ef12","src":"http://127.0.0.3/photo/image/1699052782250.jpg","left":100,"top":200,"width":367,"height":192,"cellRange":{"sc":{"ri":7,"ci":0},"ec":{"ri":14,"ci":4}}}},"charts":{"len":0},"merges":["B5:G5","B6:G6"],"rows":{"4":{"cells":{"1":{"text":"d法国电视了；科技手段拉开放假了凯撒地方离开家拉萨的弗兰克骄傲了史蒂夫","merge":[0,5]}}},"5":{"cells":{"1":{"merge":[0,5],"text":"绿卡技术的离开房间洒到了记录卡上的法律框架卢卡斯地方了看见啦SD卡","style":2},"2":{"style":2},"3":{"style":2},"4":{"style":2},"5":{"style":2},"6":{"style":2}},"height":47},"len":100},"cols":{"len":26},"validations":[],"autofilter":{}}]).change((cdata) => {
-          // console.log(cdata);
-          console.log('>>>', xs.getData());
-        });
+        // .loadData([{"name":"sheet1","freeze":"A1","styles":[{"font":{"name":"隶书"}},{"font":{"name":"隶书","size":16}},{"font":{"name":"隶书","size":16},"textwrap":true}],"images":{"len":1,"6c0c9489-1699-1603-b291-578a1c84ef12":{"id":"6c0c9489-1699-1603-b291-578a1c84ef12","src":"http://127.0.0.3/photo/image/1699052782250.jpg","left":100,"top":200,"width":367,"height":192,"cellRange":{"sc":{"ri":7,"ci":0},"ec":{"ri":14,"ci":4}}}},"charts":{"len":0},"merges":["B5:G5","B6:G6"],"rows":{"4":{"cells":{"1":{"text":"d法国电视了；科技手段拉开放假了凯撒地方离开家拉萨的弗兰克骄傲了史蒂夫","merge":[0,5]}}},"5":{"cells":{"1":{"merge":[0,5],"text":"绿卡技术的离开房间洒到了记录卡上的法律框架卢卡斯地方了看见啦SD卡","style":2},"2":{"style":2},"3":{"style":2},"4":{"style":2},"5":{"style":2},"6":{"style":2}},"height":47},"len":100},"cols":{"len":26},"validations":[],"autofilter":{}}]).change((cdata) => {
+        //   // console.log(cdata);
+        //   console.log('>>>', xs.getData());
+        // });
       //
 // console.log(3333333333,xs)
 //       xs.on('cell-selected', (cell, ri, ci) => {
